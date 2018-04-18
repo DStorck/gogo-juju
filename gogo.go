@@ -1,6 +1,7 @@
 package gogo
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"os"
@@ -20,6 +21,30 @@ type Juju struct {
 // Parallel sets the waitgroup
 type Parallel struct {
 	wg sync.WaitGroup
+}
+
+// unit status is coming from applications.<app-name>.units.<unit-name>.workload-status.current - should be active
+// app status applications.<app-name>.application-status.current - should be active
+// machine status - machines.<machine-id>.juju-status.current - should be started
+
+var jsonResults map[string]interface{}
+
+// GetClusterDeets blah
+func (j *Juju) GetClusterDeets() {
+	tmp := "JUJU_DATA=/tmp/" + j.Name
+	cmd := exec.Command("juju", "status", "--format=json")
+	cmd.Env = append(os.Environ(), tmp)
+	out, err := cmd.CombinedOutput()
+	if err != nil {
+		log.Fatalf("%s failed with %s\n", "get deets", err)
+	}
+	json.Unmarshal([]byte(out), &jsonResults)
+	appNames := jsonResults["applications"].(map[string]interface{})
+	for key, _ := range appNames {
+		// Each value is an interface{} type, that is type asserted as a string
+		fmt.Println(key)
+	}
+
 }
 
 // Spinup will create one cluster
@@ -56,6 +81,11 @@ func (j *Juju) DisplayStatus() {
 	commandResult(out, err, "display status")
 }
 
+// ClusterReady will block until all units, machines, and apps are displaying ready
+func (j *Juju) ClusterReady() {
+	fmt.Println("is your cluster ready? we shall see . ")
+}
+
 // DestroyCluster will kill off one cluster
 func (j *Juju) DestroyCluster() {
 	tmp := "JUJU_DATA=/tmp/" + j.Name
@@ -64,8 +94,6 @@ func (j *Juju) DestroyCluster() {
 	out, err := cmd.CombinedOutput()
 	commandResult(out, err, "destroy-controller")
 }
-
-var clusters = []string{"deirdre-test"}
 
 func commandResult(out []byte, err error, command string) {
 	fmt.Printf("\n%s\n", string(out))
