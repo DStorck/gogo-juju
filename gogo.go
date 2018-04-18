@@ -24,43 +24,44 @@ type Parallel struct {
 
 // Spinup will create one cluster
 func (j *Juju) Spinup() {
+	tmp := "JUJU_DATA=/tmp/" + j.Name
+
 	cmd := exec.Command("juju", "add-cloud", "lab", "-f", j.Manifest, "--replace")
-	cmd.Env = append(os.Environ(), "JUJU_DATA=/tmp/"+j.Name)
+	cmd.Env = append(os.Environ(), tmp)
 	out, err := cmd.CombinedOutput()
 	commandResult(out, err, "add-cloud")
 
 	cmd = exec.Command("juju", "add-credential", "lab", "-f", j.Manifest, "--replace")
-	cmd.Env = append(os.Environ(), "JUJU_DATA=/tmp/"+j.Name)
+	cmd.Env = append(os.Environ(), tmp)
 	out, err = cmd.CombinedOutput()
 	commandResult(out, err, "add-credential")
 
-	fmt.Printf("combined out:\n%s\n", string(out))
 	cmd = exec.Command("juju", "bootstrap", "lab")
-	cmd.Env = append(os.Environ(), "JUJU_DATA=/tmp/"+j.Name)
+	cmd.Env = append(os.Environ(), tmp)
 	out, err = cmd.CombinedOutput()
 	commandResult(out, err, "bootstrap")
 
 	cmd = exec.Command("juju", "deploy", j.Bundle)
-	cmd.Env = append(os.Environ(), "JUJU_DATA=/tmp/"+j.Name)
+	cmd.Env = append(os.Environ(), tmp)
 	out, err = cmd.CombinedOutput()
 	commandResult(out, err, "deploy")
 }
 
 // DisplayStatus will ask juju for status
 func (j *Juju) DisplayStatus() {
+	tmp := "JUJU_DATA=/tmp/" + j.Name
 	cmd := exec.Command("juju", "status")
-	cmd.Env = append(os.Environ(), "JUJU_DATA=/tmp/"+j.Name)
+	cmd.Env = append(os.Environ(), tmp)
 	out, err := cmd.CombinedOutput()
-	// fmt.Printf("\n%s\n", string(out))
 	commandResult(out, err, "display status")
 }
 
 // DestroyCluster will kill off one cluster
 func (j *Juju) DestroyCluster() {
+	tmp := "JUJU_DATA=/tmp/" + j.Name
 	cmd := exec.Command("juju", "destroy-controller", "--destroy-all-models", "lab", "-y")
-	cmd.Env = append(os.Environ(), "JUJU_DATA=/tmp/"+j.Name)
+	cmd.Env = append(os.Environ(), tmp)
 	out, err := cmd.CombinedOutput()
-	// mt.Printf("\n%s\n", string(out))
 	commandResult(out, err, "destroy-controller")
 }
 
