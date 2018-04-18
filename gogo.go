@@ -8,7 +8,7 @@ import (
 	"sync"
 )
 
-// make struct for name , bundle, manifest.
+// Juju struct - name , bundle, manifest, and connection to type Parallel
 type Juju struct {
 	name     string
 	bundle   string
@@ -24,7 +24,6 @@ type Parallel struct {
 // DisplayStatus will ask juju for status
 func (j *Juju) DisplayStatus() {
 	cmd := exec.Command("juju", "status")
-	// cmd := exec.Command("juju", "show-status", "--format=json", " | ", "jq", "'.'")
 	cmd.Env = append(os.Environ(), "JUJU_DATA=/tmp/"+j.name)
 	out, err := cmd.CombinedOutput()
 	fmt.Printf("\n%s\n", string(out))
@@ -32,8 +31,6 @@ func (j *Juju) DisplayStatus() {
 		log.Fatalf("add-cloud failed with %s\n", err)
 	}
 }
-
-// func addCloud
 
 // Spinup will create one cluster
 func (j *Juju) Spinup() {
