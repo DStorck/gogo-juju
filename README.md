@@ -34,3 +34,26 @@ clouds:
       auth-types: [oauth1]
       endpoint: <your-maas-url>
 ```
+
+
+Sample file that would use this library:
+
+```package main
+
+import (
+	"github.com/dstorck/gogo"
+)
+
+var testRun = gogo.Juju{
+	Name:     "test-cluster",
+	Bundle:   "cs:bundle/kubernetes-core-306",
+	Manifest: "manifest.yaml",
+}
+
+// Spinup cluster, wait until cluster is running, display status, destroy cluster
+func main() {
+	testRun.Spinup()
+	testRun.DisplayStatus()
+	testRun.DestroyCluster()
+}
+```
