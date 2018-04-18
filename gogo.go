@@ -10,9 +10,9 @@ import (
 
 // Juju struct - name , bundle, manifest, and connection to type Parallel
 type Juju struct {
-	name     string
-	bundle   string
-	manifest string
+	Name     string
+	Bundle   string
+	Manifest string
 	p        Parallel
 }
 
@@ -24,25 +24,25 @@ type Parallel struct {
 // DisplayStatus will ask juju for status
 func (j *Juju) DisplayStatus() {
 	cmd := exec.Command("juju", "status")
-	cmd.Env = append(os.Environ(), "JUJU_DATA=/tmp/"+j.name)
+	cmd.Env = append(os.Environ(), "JUJU_DATA=/tmp/"+j.Name)
 	out, err := cmd.CombinedOutput()
 	fmt.Printf("\n%s\n", string(out))
 	if err != nil {
-		log.Fatalf("add-cloud failed with %s\n", err)
+		log.Fatalf("display status failed with %s\n", err)
 	}
 }
 
 // Spinup will create one cluster
 func (j *Juju) Spinup() {
-	cmd := exec.Command("juju", "add-cloud", "lab", "-f", j.manifest, "--replace")
-	cmd.Env = append(os.Environ(), "JUJU_DATA=/tmp/"+j.name)
+	cmd := exec.Command("juju", "add-cloud", "lab", "-f", j.Manifest, "--replace")
+	cmd.Env = append(os.Environ(), "JUJU_DATA=/tmp/"+j.Name)
 	out, err := cmd.CombinedOutput()
 	fmt.Printf("\n%s\n", string(out))
 	if err != nil {
 		log.Fatalf("add-cloud failed with %s\n", err)
 	}
-	cmd = exec.Command("juju", "add-credential", "lab", "-f", j.manifest, "--replace")
-	cmd.Env = append(os.Environ(), "JUJU_DATA=/tmp/"+j.name)
+	cmd = exec.Command("juju", "add-credential", "lab", "-f", j.Manifest, "--replace")
+	cmd.Env = append(os.Environ(), "JUJU_DATA=/tmp/"+j.Name)
 	out, err = cmd.CombinedOutput()
 	fmt.Printf("\n%s\n", string(out))
 	if err != nil {
@@ -50,14 +50,14 @@ func (j *Juju) Spinup() {
 	}
 	fmt.Printf("combined out:\n%s\n", string(out))
 	cmd = exec.Command("juju", "bootstrap", "lab")
-	cmd.Env = append(os.Environ(), "JUJU_DATA=/tmp/"+j.name)
+	cmd.Env = append(os.Environ(), "JUJU_DATA=/tmp/"+j.Name)
 	out, err = cmd.CombinedOutput()
 	fmt.Printf("\n%s\n", string(out))
 	if err != nil {
 		log.Fatalf("Boostrap controller failed with %s\n", err)
 	}
-	cmd = exec.Command("juju", "deploy", j.bundle)
-	cmd.Env = append(os.Environ(), "JUJU_DATA=/tmp/"+j.name)
+	cmd = exec.Command("juju", "deploy", j.Bundle)
+	cmd.Env = append(os.Environ(), "JUJU_DATA=/tmp/"+j.Name)
 	out, err = cmd.CombinedOutput()
 	fmt.Printf("\n%s\n", string(out))
 	if err != nil {
@@ -67,10 +67,10 @@ func (j *Juju) Spinup() {
 }
 
 // DestroyCluster will kill off one cluster
-func (j *Juju) DestroyCluster(cluster string) {
-	cmd := exec.Command("juju", "destroy-controller", "-y", "lab")
+func (j *Juju) DestroyCluster() {
+	cmd := exec.Command("juju", "destroy-controller", "--destroy-all-models", "lab", "-y")
 	// cmd.Stdin = strings.NewReader("y")
-	cmd.Env = append(os.Environ(), "JUJU_DATA=/tmp/"+j.name)
+	cmd.Env = append(os.Environ(), "JUJU_DATA=/tmp/"+j.Name)
 	out, err := cmd.CombinedOutput()
 	fmt.Printf("\n%s\n", string(out))
 	if err != nil {
