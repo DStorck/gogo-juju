@@ -27,28 +27,23 @@ func (j *Juju) Spinup() {
 	cmd := exec.Command("juju", "add-cloud", "lab", "-f", j.Manifest, "--replace")
 	cmd.Env = append(os.Environ(), "JUJU_DATA=/tmp/"+j.Name)
 	out, err := cmd.CombinedOutput()
-	// fmt.Printf("\n%s\n", string(out))
 	commandResult(out, err, "add-cloud")
 
 	cmd = exec.Command("juju", "add-credential", "lab", "-f", j.Manifest, "--replace")
 	cmd.Env = append(os.Environ(), "JUJU_DATA=/tmp/"+j.Name)
 	out, err = cmd.CombinedOutput()
-	// fmt.Printf("\n%s\n", string(out))
 	commandResult(out, err, "add-credential")
 
 	fmt.Printf("combined out:\n%s\n", string(out))
 	cmd = exec.Command("juju", "bootstrap", "lab")
 	cmd.Env = append(os.Environ(), "JUJU_DATA=/tmp/"+j.Name)
 	out, err = cmd.CombinedOutput()
-	// fmt.Printf("\n%s\n", string(out))
 	commandResult(out, err, "bootstrap")
 
 	cmd = exec.Command("juju", "deploy", j.Bundle)
 	cmd.Env = append(os.Environ(), "JUJU_DATA=/tmp/"+j.Name)
 	out, err = cmd.CombinedOutput()
-	// fmt.Printf("\n%s\n", string(out))
 	commandResult(out, err, "deploy")
-	j.p.wg.Done()
 }
 
 // DisplayStatus will ask juju for status
@@ -65,7 +60,7 @@ func (j *Juju) DestroyCluster() {
 	cmd := exec.Command("juju", "destroy-controller", "--destroy-all-models", "lab", "-y")
 	cmd.Env = append(os.Environ(), "JUJU_DATA=/tmp/"+j.Name)
 	out, err := cmd.CombinedOutput()
-	// fmt.Printf("\n%s\n", string(out))
+	// mt.Printf("\n%s\n", string(out))
 	commandResult(out, err, "destroy-controller")
 }
 
