@@ -24,10 +24,21 @@ type Parallel struct {
 }
 
 // unit status is coming from applications.<app-name>.units.<unit-name>.workload-status.current - should be active
-// app status applications.<app-name>.application-status.current - should be active
+// app status                 applications.<app-name>.application-status.current - should be active
 // machine status - machines.<machine-id>.juju-status.current - should be started
 
-var jsonResults map[string]interface{}
+var jsonResults map[string]map[string]string
+
+type jujuStatus struct {
+	ApplicationResults map[string]interface{} `json:"applications"`
+	Machines           map[string]machines    `json:"machines"`
+}
+
+type machines struct {
+	JStatus map[string]string `json:"juju-status"`
+}
+
+var jStatsYo jujuStatus
 
 // GetClusterDeets blah
 func (j *Juju) GetClusterDeets() {
@@ -38,13 +49,13 @@ func (j *Juju) GetClusterDeets() {
 	if err != nil {
 		log.Fatalf("%s failed with %s\n", "get deets", err)
 	}
-	json.Unmarshal([]byte(out), &jsonResults)
-	appNames := jsonResults["applications"].(map[string]interface{})
-	for key, _ := range appNames {
-		// Each value is an interface{} type, that is type asserted as a string
-		fmt.Println(key)
+
+	json.Unmarshal([]byte(out), &jStatsYo)
+	for k := range jStatsYo.Machines {
+		fmt.Printf("machine %s status: %s\n", k, jStatsYo.Machines[k].JStatus["current"])
 	}
 
+	// json.Unmarshal([]byte(out), &jsonResults)
 }
 
 // Spinup will create one cluster
@@ -83,7 +94,7 @@ func (j *Juju) DisplayStatus() {
 
 // ClusterReady will block until all units, machines, and apps are displaying ready
 func (j *Juju) ClusterReady() {
-	fmt.Println("is your cluster ready? we shall see . ")
+	fmt.Println("is your cluster ready? we shall see . ") // todo
 }
 
 // DestroyCluster will kill off one cluster
