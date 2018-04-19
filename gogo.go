@@ -39,7 +39,7 @@ type applications struct {
 var jStats jujuStatus
 
 // GetClusterDeets will check status and return true if cluster is running
-func (j *Juju) GetClusterDeets() {
+func (j *Juju) GetJujuStatus() {
 	tmp := "JUJU_DATA=/tmp/" + j.Name
 	cmd := exec.Command("juju", "status", "--format=json")
 	cmd.Env = append(os.Environ(), tmp)

@@ -4,8 +4,8 @@
 With a valid `manifest.yaml` to pass along creds and cloud info, this can be used for :
 
 - `Spinup()`
-- `DisplayStatus()`
-- `ClusterReady()`
+- `GetJujuStatus()`
+- `ClusterReady()` - WIP
 - `DestroyCluster()`
 
 ## Notes:
@@ -52,8 +52,8 @@ var testRun = gogo.Juju{
 
 // Spinup cluster, wait until cluster is running, display status, destroy cluster
 func main() {
-	testRun.Spinup()
-	testRun.DisplayStatus()
-	testRun.DestroyCluster()
+	 testRun.Spinup()
+	 testRun.GetJujuStatus()
+	 testRun.DestroyCluster()
 }
 ```
