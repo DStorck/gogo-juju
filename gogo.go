@@ -61,6 +61,7 @@ func (j *Juju) GetJujuStatus() string {
 	for k := range jStats.ApplicationResults {
 		appStatus := jStats.ApplicationResults[k].AppStatus["current"]
 		if appStatus != "active" {
+			fmt.Println("Cluster Not Ready")
 			return "Cluster Not Ready"
 		}
 	}
