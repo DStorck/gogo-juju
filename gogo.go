@@ -18,44 +18,49 @@ type Juju struct {
 	p        Parallel
 }
 
-// Parallel sets the waitgroup
+// Parallel sets the waitgroup if user wishes to bring up several clusters at once
 type Parallel struct {
 	wg sync.WaitGroup
 }
 
-// unit status is coming from applications.<app-name>.units.<unit-name>.workload-status.current - should be active
-// app status                 applications.<app-name>.application-status.current - should be active
-// machine status - machines.<machine-id>.juju-status.current - should be started
-
-var jsonResults map[string]map[string]string
-
 type jujuStatus struct {
-	ApplicationResults map[string]interface{} `json:"applications"`
-	Machines           map[string]machines    `json:"machines"`
+	ApplicationResults map[string]applications `json:"applications"`
+	Machines           map[string]machines     `json:"machines"`
 }
 
 type machines struct {
-	JStatus map[string]string `json:"juju-status"`
+	MachStatus map[string]string `json:"juju-status"`
 }
 
-var jStatsYo jujuStatus
+type applications struct {
+	AppStatus map[string]string `json:"application-status"`
+}
 
-// GetClusterDeets blah
+var jStats jujuStatus
+
+// GetClusterDeets will check status and return true if cluster is running
 func (j *Juju) GetClusterDeets() {
 	tmp := "JUJU_DATA=/tmp/" + j.Name
 	cmd := exec.Command("juju", "status", "--format=json")
 	cmd.Env = append(os.Environ(), tmp)
 	out, err := cmd.CombinedOutput()
 	if err != nil {
-		log.Fatalf("%s failed with %s\n", "get deets", err)
+		log.Fatalf("%s failed with %s\n", "get cluster deets", err)
 	}
 
-	json.Unmarshal([]byte(out), &jStatsYo)
-	for k := range jStatsYo.Machines {
-		fmt.Printf("machine %s status: %s\n", k, jStatsYo.Machines[k].JStatus["current"])
+	json.Unmarshal([]byte(out), &jStats)
+
+	for k := range jStats.Machines {
+
+		// machineStatus := jStats.Machines[k].MachStatus["current"]
+		// fmt.Printf("machine status: %s\n", machineStatus)
+		fmt.Printf("machine %s status: %s\n", k, jStats.Machines[k].MachStatus["current"])
 	}
 
-	// json.Unmarshal([]byte(out), &jsonResults)
+	for k := range jStats.ApplicationResults {
+		fmt.Printf("app %s status: %s\n", k, jStats.ApplicationResults[k].AppStatus["current"])
+	}
+
 }
 
 // Spinup will create one cluster
