@@ -50,7 +50,7 @@ var testRun = gogo.Juju{
 	Manifest: "manifest.yaml",
 }
 
-// Spinup cluster, wait until cluster is running, display status, destroy cluster
+// current available commands, not meant to be run all at once
 func main() {
 	 testRun.Spinup()
 	 testRun.GetJujuStatus()
