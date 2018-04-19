@@ -38,8 +38,8 @@ type applications struct {
 
 var jStats jujuStatus
 
-// GetClusterDeets will check status and return true if cluster is running
-func (j *Juju) GetJujuStatus() {
+// GetJujuStatus will check status and return true if cluster is running
+func (j *Juju) GetJujuStatus() string {
 	tmp := "JUJU_DATA=/tmp/" + j.Name
 	cmd := exec.Command("juju", "status", "--format=json")
 	cmd.Env = append(os.Environ(), tmp)
@@ -51,16 +51,22 @@ func (j *Juju) GetJujuStatus() {
 	json.Unmarshal([]byte(out), &jStats)
 
 	for k := range jStats.Machines {
-
-		// machineStatus := jStats.Machines[k].MachStatus["current"]
-		// fmt.Printf("machine status: %s\n", machineStatus)
-		fmt.Printf("machine %s status: %s\n", k, jStats.Machines[k].MachStatus["current"])
+		machineStatus := jStats.Machines[k].MachStatus["current"]
+		if machineStatus != "started" {
+			fmt.Println("Cluster Not Ready")
+			return "Not Ready"
+		}
 	}
 
 	for k := range jStats.ApplicationResults {
-		fmt.Printf("app %s status: %s\n", k, jStats.ApplicationResults[k].AppStatus["current"])
+		appStatus := jStats.ApplicationResults[k].AppStatus["current"]
+		if appStatus != "active" {
+			return "Cluster Not Ready"
+		}
 	}
 
+	fmt.Println("Cluster Ready")
+	return "Ready"
 }
 
 // Spinup will create one cluster
