@@ -6,6 +6,7 @@ With a valid `manifest.yaml` to pass along creds and cloud info, this can be use
 - `Spinup()`
 - `GetJujuStatus()`
 - `ClusterReady()` - WIP
+- `GetKubeConfig()`
 - `DestroyCluster()`
 
 ## Notes:
@@ -54,6 +55,7 @@ var testRun = gogo.Juju{
 func main() {
 	 testRun.Spinup()
 	 testRun.GetJujuStatus()
+   testRun.GetKubeConfig()
 	 testRun.DestroyCluster()
 }
 ```
