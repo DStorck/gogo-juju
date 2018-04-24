@@ -13,29 +13,29 @@ func newSuperCred(c creds) *superCred {
 	return &sc
 }
 
-type creds map[string]User
+type creds map[string]user
 
-type User map[string]Auth
+type user map[string]auth
 
-type Auth struct {
-	AuthType  string `yaml:"auth-type,flow"`
-	MaasOauth string
+type auth struct {
+	AuthType  string `yaml:"auth-type"`
+	MaasOauth string `yaml:"maas-oauth"`
 }
 
-// CreateMAASCloudYaml is used to create the yaml string to pass to "juju add-cloud"
-func CreateMAASCredsYaml(name string, user, string, maasOauth string) (string, error) {
+// CreateMAASCredsYaml is used to create the yaml string to pass to "juju add-credential"
+func CreateMAASCredsYaml(name string, username string, maasOauth string) (string, error) {
 	if name == "" {
 		return "", errors.New("Name must not be empty")
 	}
-	if user == "" {
+	if username == "" {
 		return "", errors.New("User must not be empty")
 	}
 	if maasOauth == "" {
 		return "", errors.New("Maas-Oauth must not be empty")
 	}
 	lab := newSuperCred(creds{
-		name: User{
-			user: Auth{
+		name: user{
+			username: auth{
 				AuthType:  "oauth1",
 				MaasOauth: maasOauth,
 			},
@@ -49,23 +49,8 @@ func CreateMAASCredsYaml(name string, user, string, maasOauth string) (string, e
 	return string(output), nil
 }
 
-// func main() {
-// 	out, err := CreateMAASCloudYaml("lab", "http://192.168.2.24/MAAS/api/2.0")
-// 	if err != nil {
-// 		fmt.Println(err)
-// 		return
-// 	}
-// 	fmt.Println(out)
-// }
-
 // credentials:
 //   lab:
-//     deirdre:
+//     <username>:
 //       auth-type: oauth1
-//       maas-oauth: 85uf5sEpqyNHy6ALVy:fpEbqGPz9tS9qfJNxc:8AfrxLgLKyTPUC4679jkZtMq7GhG4UwJ
-
-// clouds:
-//   lab:
-//     type: maas
-//     auth-types: [oauth1]
-//     endpoint: http://192.168.2.24/MAAS/api/2.0/
+//       maas-oauth: <your-maas-secret>
