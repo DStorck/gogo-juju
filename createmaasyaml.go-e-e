@@ -44,14 +44,7 @@ func CreateMAASCloudYaml(name string, endpoint string) (string, error) {
 	return string(output), nil
 }
 
-// func main() {
-// 	out, err := CreateMAASCloudYaml("lab", "http://192.168.2.24/MAAS/api/2.0")
-// 	if err != nil {
-// 		fmt.Println(err)
-// 		return
-// 	}
-// 	fmt.Println(out)
-// }
+// will produce this yaml:
 
 // clouds:
 //   lab:

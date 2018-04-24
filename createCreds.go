@@ -23,9 +23,9 @@ type auth struct {
 }
 
 // CreateMAASCredsYaml is used to create the yaml string to pass to "juju add-credential"
-func CreateMAASCredsYaml(name string, username string, maasOauth string) (string, error) {
-	if name == "" {
-		return "", errors.New("Name must not be empty")
+func CreateMAASCredsYaml(cloudName string, username string, maasOauth string) (string, error) {
+	if cloudName == "" {
+		return "", errors.New("cloudName must not be empty")
 	}
 	if username == "" {
 		return "", errors.New("User must not be empty")
@@ -34,7 +34,7 @@ func CreateMAASCredsYaml(name string, username string, maasOauth string) (string
 		return "", errors.New("Maas-Oauth must not be empty")
 	}
 	lab := newSuperCred(creds{
-		name: user{
+		cloudName: user{
 			username: auth{
 				AuthType:  "oauth1",
 				MaasOauth: maasOauth,
