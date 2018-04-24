@@ -11,7 +11,7 @@ import (
 var jStats jujuStatus
 
 // GetJujuStatus will check status and return true if cluster is running
-func (j *Juju) GetJujuStatus() string {
+func (j *Juju) GetJujuStatus() bool {
 	tmp := "JUJU_DATA=/tmp/" + j.Name
 	cmd := exec.Command("juju", "status", "--format=json")
 	cmd.Env = append(os.Environ(), tmp)
@@ -26,7 +26,7 @@ func (j *Juju) GetJujuStatus() string {
 		machineStatus := jStats.Machines[k].MachStatus["current"]
 		if machineStatus != "started" {
 			fmt.Println("Cluster Not Ready")
-			return "Cluster Not Ready"
+			return false
 		}
 	}
 
@@ -34,12 +34,12 @@ func (j *Juju) GetJujuStatus() string {
 		appStatus := jStats.ApplicationResults[k].AppStatus["current"]
 		if appStatus != "active" {
 			fmt.Println("Cluster Not Ready")
-			return "Cluster Not Ready"
+			return false
 		}
 	}
 
 	fmt.Println("Cluster Ready")
-	return "Ready"
+	return true
 }
 
 // Spinup will create one cluster
