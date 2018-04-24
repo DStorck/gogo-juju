@@ -6,48 +6,25 @@ import (
 	"log"
 	"os"
 	"os/exec"
-	"strings"
 )
 
 var jStats jujuStatus
 
-// SetCloudAndCreds will grab cloud and credential information and set it
-func (j *Juju) SetCloudAndCreds() {
-	tmp := "JUJU_DATA=/tmp/" + j.Name
-
-	manifest, err := CreateMAASCloudYaml(j.Cl.Type, j.Cl.Endpoint)
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-	fmt.Println(manifest)
-	cmd := exec.Command("juju", "add-cloud", "lab", "-f", "/dev/stdin", "--replace")
-	cmd.Stdin = strings.NewReader(manifest)
-	cmd.Env = append(os.Environ(), tmp)
-	out, err := cmd.CombinedOutput()
-	commandResult(out, err, "add-cloud")
-
-	creds, err := CreateMAASCredsYaml(j.Cr.CloudName, j.Cr.Username, j.Cr.MaasOauth)
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-	fmt.Println(creds)
-
-	cmd = exec.Command("juju", "add-credential", "lab", "-f", "/dev/stdin", "--replace")
-	cmd.Stdin = strings.NewReader(creds)
-	cmd.Env = append(os.Environ(), tmp)
-	out, err = cmd.CombinedOutput()
-	commandResult(out, err, "add-credential")
-}
-
 // Spinup will create one cluster
 func (j *Juju) Spinup() {
+	bootstrap := ""
 	tmp := "JUJU_DATA=/tmp/" + j.Name
+	fmt.Printf("kind is %s\n", j.Kind)
+	if j.Kind == "aws" {
+		j.SetAWSCreds()
+		bootstrap = j.AwsCl.Region
+	} else if j.Kind == "maas" {
+		j.SetMAASCloud()
+		j.SetMAASCreds()
+		bootstrap = j.MaasCl.Type
+	}
 
-	j.SetCloudAndCreds()
-
-	cmd := exec.Command("juju", "bootstrap", j.Cl.Type)
+	cmd := exec.Command("juju", "bootstrap", bootstrap) // with aws this is is expecting region ex - juju bootstrap aws/us-west-2
 	cmd.Env = append(os.Environ(), tmp)
 	out, err := cmd.CombinedOutput()
 	commandResult(out, err, "bootstrap")
