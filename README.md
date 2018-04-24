@@ -48,10 +48,10 @@ var myCreds = gogo.Credentials{
 
 // current available commands, not meant to be run all at once
 func main() {
-	 testRun.Spinup()
-   testRun.DisplayStatus()
-	 testRun.ClusterReady()
-   testRun.GetKubeConfig()
-	 testRun.DestroyCluster()
+  testRun.Spinup()
+  testRun.DisplayStatus()
+  testRun.ClusterReady()
+  testRun.GetKubeConfig()
+  testRun.DestroyCluster()
 }
 ```
