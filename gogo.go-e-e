@@ -6,12 +6,69 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"strings"
 )
 
 var jStats jujuStatus
 
-// GetJujuStatus will check status and return true if cluster is running
-func (j *Juju) GetJujuStatus() bool {
+// SetCloudAndCreds will grab cloud and credential information and set it
+func (j *Juju) SetCloudAndCreds() {
+	tmp := "JUJU_DATA=/tmp/" + j.Name
+
+	manifest, err := CreateMAASCloudYaml(j.Cl.Type, j.Cl.Endpoint)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	fmt.Println(manifest)
+	cmd := exec.Command("juju", "add-cloud", "lab", "-f", "/dev/stdin", "--replace")
+	cmd.Stdin = strings.NewReader(manifest)
+	cmd.Env = append(os.Environ(), tmp)
+	out, err := cmd.CombinedOutput()
+	commandResult(out, err, "add-cloud")
+
+	creds, err := CreateMAASCredsYaml(j.Cr.CloudName, j.Cr.Username, j.Cr.MaasOauth)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	fmt.Println(creds)
+
+	cmd = exec.Command("juju", "add-credential", "lab", "-f", "/dev/stdin", "--replace")
+	cmd.Stdin = strings.NewReader(creds)
+	cmd.Env = append(os.Environ(), tmp)
+	out, err = cmd.CombinedOutput()
+	commandResult(out, err, "add-credential")
+}
+
+// Spinup will create one cluster
+func (j *Juju) Spinup() {
+	tmp := "JUJU_DATA=/tmp/" + j.Name
+
+	j.SetCloudAndCreds()
+
+	cmd := exec.Command("juju", "bootstrap", j.Cl.Type)
+	cmd.Env = append(os.Environ(), tmp)
+	out, err := cmd.CombinedOutput()
+	commandResult(out, err, "bootstrap")
+
+	cmd = exec.Command("juju", "deploy", j.Bundle)
+	cmd.Env = append(os.Environ(), tmp)
+	out, err = cmd.CombinedOutput()
+	commandResult(out, err, "deploy")
+}
+
+// DisplayStatus will ask juju for status
+func (j *Juju) DisplayStatus() {
+	tmp := "JUJU_DATA=/tmp/" + j.Name
+	cmd := exec.Command("juju", "status")
+	cmd.Env = append(os.Environ(), tmp)
+	out, err := cmd.CombinedOutput()
+	commandResult(out, err, "display status")
+}
+
+// ClusterReady will check status and return true if cluster is running
+func (j *Juju) ClusterReady() bool {
 	tmp := "JUJU_DATA=/tmp/" + j.Name
 	cmd := exec.Command("juju", "status", "--format=json")
 	cmd.Env = append(os.Environ(), tmp)
@@ -42,43 +99,13 @@ func (j *Juju) GetJujuStatus() bool {
 	return true
 }
 
-// Spinup will create one cluster
-func (j *Juju) Spinup() {
+// GetKubeConfig will cat out kubernetes config to stdout
+func (j *Juju) GetKubeConfig() {
 	tmp := "JUJU_DATA=/tmp/" + j.Name
-
-	cmd := exec.Command("juju", "add-cloud", "lab", "-f", j.Manifest, "--replace")
+	cmd := exec.Command("juju", "ssh", "kubernetes-master/0", "cat", "config")
 	cmd.Env = append(os.Environ(), tmp)
 	out, err := cmd.CombinedOutput()
-	commandResult(out, err, "add-cloud")
-
-	cmd = exec.Command("juju", "add-credential", "lab", "-f", j.Manifest, "--replace")
-	cmd.Env = append(os.Environ(), tmp)
-	out, err = cmd.CombinedOutput()
-	commandResult(out, err, "add-credential")
-
-	cmd = exec.Command("juju", "bootstrap", "lab")
-	cmd.Env = append(os.Environ(), tmp)
-	out, err = cmd.CombinedOutput()
-	commandResult(out, err, "bootstrap")
-
-	cmd = exec.Command("juju", "deploy", j.Bundle)
-	cmd.Env = append(os.Environ(), tmp)
-	out, err = cmd.CombinedOutput()
-	commandResult(out, err, "deploy")
-}
-
-// DisplayStatus will ask juju for status
-func (j *Juju) DisplayStatus() {
-	tmp := "JUJU_DATA=/tmp/" + j.Name
-	cmd := exec.Command("juju", "status")
-	cmd.Env = append(os.Environ(), tmp)
-	out, err := cmd.CombinedOutput()
-	commandResult(out, err, "display status")
-}
-
-// ClusterReady will block until all units, machines, and apps are displaying ready
-func (j *Juju) ClusterReady() {
-	fmt.Println("is your cluster ready? we shall see . ") // todo
+	commandResult(out, err, "get kube config")
 }
 
 // DestroyCluster will kill off one cluster
@@ -97,16 +124,7 @@ func commandResult(out []byte, err error, command string) {
 	}
 }
 
-// GetKubeConfig will cat out kubernetes config to stdout
-func (j *Juju) GetKubeConfig() {
-	tmp := "JUJU_DATA=/tmp/" + j.Name
-	cmd := exec.Command("juju", "ssh", "kubernetes-master/0", "cat", "config")
-	cmd.Env = append(os.Environ(), tmp)
-	out, err := cmd.CombinedOutput()
-	commandResult(out, err, "get kube config")
-}
-
-// Create will create all clusters in an array given their names
+// Create is an example of spinning up multiple clusters
 func (j *Juju) Create(clusters []string) {
 	// clusters := []string{"d8048274-2bc6-49bf-81fd-846aeaddf2fe", "97c19eda-7aeb-4eee-a35c-57dc3755d98f"}
 
