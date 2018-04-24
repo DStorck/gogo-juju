@@ -1,8 +1,3 @@
-// clouds:
-//   kraken:
-//     type: maas
-//     auth-types: [oauth1]
-//     endpoint: http://192.168.2.24/MAAS/api/2.0/
 package gogo
 
 import (
@@ -57,3 +52,9 @@ func CreateMAASCloudYaml(name string, endpoint string) (string, error) {
 // 	}
 // 	fmt.Println(out)
 // }
+
+// clouds:
+//   lab:
+//     type: maas
+//     auth-types: [oauth1]
+//     endpoint: http://192.168.2.24/MAAS/api/2.0/
