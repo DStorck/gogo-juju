@@ -1,6 +1,10 @@
 
 # GO Library to use JUJU commands to bring up a Kubernetes cluster
 
+### Pre-reqs
+
+`go get gopkg.in/yaml.v2`
+
 With a valid `manifest.yaml` to pass along creds and cloud info, this can be used for :
 
 - `Spinup()`
