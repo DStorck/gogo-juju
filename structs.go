@@ -2,7 +2,7 @@ package gogo
 
 import "sync"
 
-// Juju defines the cluster name, which bundle to use, and the manifest for credentials and clouda
+// Juju defines the cluster name, which bundle to use, and the manifest for credentials and cloud
 type Juju struct {
 	Name     string
 	Bundle   string
