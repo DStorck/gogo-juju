@@ -9,9 +9,10 @@
 
 With a valid `manifest.yaml` to pass along creds and cloud info, this can be used for :
 
+- `SetCloudAndCreds()` - sets cloud and credentials information for use with `juju`
 - `Spinup()` - will spinup cluster from specified creds/cloud/bundle
-- `ClusterReady()` - will return boolean corresponding to readiness of cluster
 - `DisplayStatus()` - will display results of running `juju status`
+- `ClusterReady()` - will return boolean corresponding to readiness of cluster
 - `GetKubeConfig()` - will print out kubeconfig to stdout
 - `DestroyCluster()` - will tear down juju controller and associated cluster
 
@@ -48,6 +49,7 @@ var myCreds = gogo.Credentials{
 
 // current available commands, not meant to be run all at once
 func main() {
+	testRun.SetCloudAndCreds()
   testRun.Spinup()
   testRun.DisplayStatus()
   testRun.ClusterReady()
