@@ -54,7 +54,7 @@ func (j *Juju) GetJujuStatus() string {
 		machineStatus := jStats.Machines[k].MachStatus["current"]
 		if machineStatus != "started" {
 			fmt.Println("Cluster Not Ready")
-			return "Not Ready"
+			return "Cluster Not Ready"
 		}
 	}
 
@@ -123,6 +123,15 @@ func commandResult(out []byte, err error, command string) {
 	if err != nil {
 		log.Fatalf("%s failed with %s\n", command, err)
 	}
+}
+
+// GetKubeConfig will cat out kubernetes config to stdout
+func (j *Juju) GetKubeConfig() {
+	tmp := "JUJU_DATA=/tmp/" + j.Name
+	cmd := exec.Command("juju", "ssh", "kubernetes-master/0", "cat", "config")
+	cmd.Env = append(os.Environ(), tmp)
+	out, err := cmd.CombinedOutput()
+	commandResult(out, err, "get kube config")
 }
 
 // Create will create all clusters in an array given their names
