@@ -49,7 +49,7 @@ var myCreds = gogo.Credentials{
 
 // current available commands, not meant to be run all at once
 func main() {
-	testRun.SetCloudAndCreds()
+  testRun.SetCloudAndCreds()
   testRun.Spinup()
   testRun.DisplayStatus()
   testRun.ClusterReady()
