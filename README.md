@@ -17,28 +17,7 @@ With a valid `manifest.yaml` to pass along creds and cloud info, this can be use
 
 ## Notes:
 
-`manifest.yaml` will for include credentials and cloud information to be consumed by gogo.go
-
-
-Should be of the format:
-```
-credentials:
-  aws:
-    <name>:
-      auth-type: access-key
-      access-key: <aws-access-key>
-      secret-key: <aws-secret-key>
-  lab:
-    <name>:
-      auth-type: oauth1
-      maas-oauth: <maas-api-key>
-
-clouds:
-   lab:
-      type: maas
-      auth-types: [oauth1]
-      endpoint: <your-maas-url>
-```
+We will pass in cloud and credential information from the Custom Resource.
 
 Sample file that would use this library:
 
@@ -51,8 +30,21 @@ import (
 var testRun = gogo.Juju{
 	Name:     "test-cluster",
 	Bundle:   "cs:bundle/kubernetes-core-306",
-	Manifest: "manifest.yaml",
+	Cl:       myCloud,
+	Cr:       myCreds,
 }
+
+var myCloud = gogo.Cloud{
+	Type:     "lab",
+	Endpoint: "http://192.168.2.24/MAAS/api/2.0",
+}
+
+var myCreds = gogo.Credentials{
+	CloudName: "lab",
+	Username:  "<your-maas-username>",
+	MaasOauth: "<your-maas-secret>",
+}
+
 
 // current available commands, not meant to be run all at once
 func main() {
