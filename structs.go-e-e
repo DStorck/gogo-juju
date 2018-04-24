@@ -4,10 +4,24 @@ import "sync"
 
 // Juju defines the cluster name, which bundle to use, and the manifest for credentials and cloud
 type Juju struct {
-	Name     string
-	Bundle   string
-	Manifest string
-	p        Parallel
+	Name   string
+	Bundle string
+	p      Parallel
+	Cl     Cloud
+	Cr     Credentials
+}
+
+// Cloud information
+type Cloud struct {
+	Type     string
+	Endpoint string
+}
+
+// Credentials to be used with this cloud
+type Credentials struct {
+	CloudName string
+	Username  string
+	MaasOauth string
 }
 
 // Parallel sets the waitgroup if user wishes to bring up several clusters at once
