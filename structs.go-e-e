@@ -2,6 +2,7 @@ package gogo
 
 import "sync"
 
+// Juju defines the cluster name, which bundle to use, and the manifest for credentials and clouda
 type Juju struct {
 	Name     string
 	Bundle   string
@@ -13,6 +14,8 @@ type Juju struct {
 type Parallel struct {
 	wg sync.WaitGroup
 }
+
+// the following structs are for json parsing used with GetJujuStatus()
 
 type jujuStatus struct {
 	ApplicationResults map[string]applications `json:"applications"`
