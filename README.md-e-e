@@ -7,7 +7,7 @@
 
 ## Usage
 
-With a valid `manifest.yaml` to pass along creds and cloud info, this can be used for :
+Working commands:
 
 - `SetCloudAndCreds()` - sets cloud and credentials information for use with `juju`
 - `Spinup()` - will spinup cluster from specified creds/cloud/bundle
