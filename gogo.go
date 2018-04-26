@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"strings"
 )
 
 var jStats jujuStatus
@@ -13,20 +14,32 @@ var jStats jujuStatus
 // Spinup will create one cluster
 func (j *Juju) Spinup() {
 	controller := ""
+	user := ""
 	tmp := "JUJU_DATA=/tmp/" + j.Name
 	if j.Kind == "aws" {
 		j.SetAWSCreds()
 		controller = j.AwsCl.Region
+		user = j.AwsCr.Username
 	} else if j.Kind == "maas" {
 		j.SetMAASCloud()
 		j.SetMAASCreds()
 		controller = j.MaasCl.Type
+		user = j.MaasCr.Username
 	}
 
-	cmd := exec.Command("juju", "bootstrap", controller) // with aws this is is expecting region ex - juju bootstrap aws/us-west-2
+	credscommand := "--credential=" + user
+
+	cmd := exec.Command("juju", "bootstrap", controller, credscommand)
+
+	// cmd := exec.Command("juju", "bootstrap", controller) // with aws this is is expecting region ex - juju bootstrap aws/us-west-2
 	cmd.Env = append(os.Environ(), tmp)
 	out, err := cmd.CombinedOutput()
 	commandResult(out, err, "bootstrap")
+
+	cmd = exec.Command("juju", "add-model", j.Name, credscommand)
+	cmd.Env = append(os.Environ(), tmp)
+	out, err = cmd.CombinedOutput()
+	commandResult(out, err, "add-model")
 
 	cmd = exec.Command("juju", "deploy", j.Bundle)
 	cmd.Env = append(os.Environ(), tmp)
@@ -92,6 +105,8 @@ func (j *Juju) DestroyCluster() {
 	} else if j.Kind == "maas" {
 		controller = j.MaasCl.Type
 	}
+	controller = strings.Replace(controller, "/", "-", -1)
+
 	tmp := "JUJU_DATA=/tmp/" + j.Name
 	cmd := exec.Command("juju", "destroy-controller", "--destroy-all-models", controller, "-y")
 	cmd.Env = append(os.Environ(), tmp)
