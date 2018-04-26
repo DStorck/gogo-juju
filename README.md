@@ -35,11 +35,11 @@ var testRun = gogo.Juju{
 	MaasCr: myMaasCreds,
 }
 
-var myMaasCloud = gogo.Cloud{
+var myMaasCloud = gogo.MaasCloud{
 	Type:     "lab",
 	Endpoint: "<your-maas-url>",
 }
-var myMaasCreds = gogo.Credentials{
+var myMaasCreds = gogo.MaasCredentials{
 	CloudName: "lab",
 	Username:  "deirdre",
 	MaasOauth: "<maas-password>",
