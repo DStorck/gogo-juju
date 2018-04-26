@@ -12,19 +12,18 @@ var jStats jujuStatus
 
 // Spinup will create one cluster
 func (j *Juju) Spinup() {
-	bootstrap := ""
+	controller := ""
 	tmp := "JUJU_DATA=/tmp/" + j.Name
-	fmt.Printf("kind is %s\n", j.Kind)
 	if j.Kind == "aws" {
 		j.SetAWSCreds()
-		bootstrap = j.AwsCl.Region
+		controller = j.AwsCl.Region
 	} else if j.Kind == "maas" {
 		j.SetMAASCloud()
 		j.SetMAASCreds()
-		bootstrap = j.MaasCl.Type
+		controller = j.MaasCl.Type
 	}
 
-	cmd := exec.Command("juju", "bootstrap", bootstrap) // with aws this is is expecting region ex - juju bootstrap aws/us-west-2
+	cmd := exec.Command("juju", "bootstrap", controller) // with aws this is is expecting region ex - juju bootstrap aws/us-west-2
 	cmd.Env = append(os.Environ(), tmp)
 	out, err := cmd.CombinedOutput()
 	commandResult(out, err, "bootstrap")
@@ -87,8 +86,14 @@ func (j *Juju) GetKubeConfig() {
 
 // DestroyCluster will kill off one cluster
 func (j *Juju) DestroyCluster() {
+	controller := ""
+	if j.Kind == "aws" {
+		controller = j.AwsCl.Region
+	} else if j.Kind == "maas" {
+		controller = j.MaasCl.Type
+	}
 	tmp := "JUJU_DATA=/tmp/" + j.Name
-	cmd := exec.Command("juju", "destroy-controller", "--destroy-all-models", "lab", "-y")
+	cmd := exec.Command("juju", "destroy-controller", "--destroy-all-models", controller, "-y")
 	cmd.Env = append(os.Environ(), tmp)
 	out, err := cmd.CombinedOutput()
 	commandResult(out, err, "destroy-controller")
