@@ -63,7 +63,7 @@ func (j *Juju) ClusterReady() bool {
 	cmd.Env = append(os.Environ(), tmp)
 	out, err := cmd.CombinedOutput()
 	if err != nil {
-		log.Fatalf("%s failed with %s\n", "get cluster deets", err)
+		log.Fatalf("ClusterReady() failed with %s\n", err)
 	}
 
 	json.Unmarshal([]byte(out), &jStats)
