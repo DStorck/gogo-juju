@@ -4,24 +4,39 @@ import "sync"
 
 // Juju defines the cluster name, which bundle to use, and the manifest for credentials and cloud
 type Juju struct {
+	Kind   string // should be "maas" or "aws" - will be used to figure out which creds and cloud to set
 	Name   string
-	Bundle string
+	Bundle string // ex "cs:bundle/canonical-kubernetes-193"
 	p      Parallel
-	Cl     Cloud
-	Cr     Credentials
+	MaasCl MaasCloud
+	MaasCr MaasCredentials
+	AwsCl  AWSCloud
+	AwsCr  AWSCredentials
 }
 
-// Cloud information
-type Cloud struct {
+// MaasCloud information
+type MaasCloud struct {
 	Type     string
 	Endpoint string
 }
 
-// Credentials to be used with this cloud
-type Credentials struct {
+// MaasCredentials to be used with MaasCloud
+type MaasCredentials struct {
 	CloudName string
 	Username  string
 	MaasOauth string
+}
+
+// AWSCredentials information
+type AWSCredentials struct {
+	Username  string
+	AccessKey string
+	SecretKey string
+}
+
+// AWSCloud information to be used with AWS Creds
+type AWSCloud struct {
+	Region string
 }
 
 // Parallel sets the waitgroup if user wishes to bring up several clusters at once

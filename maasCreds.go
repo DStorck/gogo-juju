@@ -2,6 +2,10 @@ package gogo
 
 import (
 	"errors"
+	"fmt"
+	"os"
+	"os/exec"
+	"strings"
 
 	yaml "gopkg.in/yaml.v2"
 )
@@ -49,8 +53,20 @@ func CreateMAASCredsYaml(cloudName string, username string, maasOauth string) (s
 	return string(output), nil
 }
 
-// credentials:
-//   lab:
-//     <username>:
-//       auth-type: oauth1
-//       maas-oauth: <your-maas-secret>
+// SetMAASCreds will pass in maas credentials to juju add-credential
+func (j *Juju) SetMAASCreds() {
+	tmp := "JUJU_DATA=/tmp/" + j.Name
+
+	creds, err := CreateMAASCredsYaml(j.MaasCr.CloudName, j.MaasCr.Username, j.MaasCr.MaasOauth)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	fmt.Println(creds)
+
+	cmd := exec.Command("juju", "add-credential", "lab", "-f", "/dev/stdin", "--replace")
+	cmd.Stdin = strings.NewReader(creds)
+	cmd.Env = append(os.Environ(), tmp)
+	out, err := cmd.CombinedOutput()
+	commandResult(out, err, "add-credential")
+}
