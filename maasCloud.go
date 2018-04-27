@@ -2,6 +2,10 @@ package gogo
 
 import (
 	"errors"
+	"fmt"
+	"os"
+	"os/exec"
+	"strings"
 
 	yaml "gopkg.in/yaml.v2"
 )
@@ -44,10 +48,19 @@ func CreateMAASCloudYaml(name string, endpoint string) (string, error) {
 	return string(output), nil
 }
 
-// will produce this yaml:
+// SetMAASCloud will run juju add-cloud with maasCloud yaml created above
+func (j *Juju) SetMAASCloud() {
+	tmp := "JUJU_DATA=/tmp/" + j.Name
 
-// clouds:
-//   lab:
-//     type: maas
-//     auth-types: [oauth1]
-//     endpoint: http://192.168.2.24/MAAS/api/2.0/
+	cloudInfo, err := CreateMAASCloudYaml(j.MaasCl.Type, j.MaasCl.Endpoint)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	fmt.Println(cloudInfo)
+	cmd := exec.Command("juju", "add-cloud", "lab", "-f", "/dev/stdin", "--replace")
+	cmd.Stdin = strings.NewReader(cloudInfo)
+	cmd.Env = append(os.Environ(), tmp)
+	out, err := cmd.CombinedOutput()
+	commandResult(out, err, "add-cloud")
+}
