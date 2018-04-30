@@ -57,6 +57,7 @@ You will need to set the instance of `Juju` with the following fields:
 - `ClusterReady()` - will return boolean corresponding to readiness of cluster
 - `GetKubeConfig()` - return the contents of the kubeconfig file
 - `DestroyCluster()` - will tear down juju controller and associated cluster
+- `DestroyComplete()` will return boolean corresponding to destruction of cluster 
 
 
 ### Sample file to bring up maas cluster on Samsung's CNCT nuc lab:
