@@ -57,7 +57,7 @@ func CreateAWSCredsYaml(username string, accessKey string, secretKey string) (st
 
 // SetAWSCreds will grab and credential information and set it
 func (j *Juju) SetAWSCreds() {
-	tmp := "JUJU_DATA=/tmp/" + j.Name
+	tmp := "JUJU_DATA=" + JujuDataPrefix + j.Name
 
 	creds, err := CreateAWSCredsYaml(j.AwsCr.Username, j.AwsCr.AccessKey, j.AwsCr.SecretKey)
 	if err != nil {

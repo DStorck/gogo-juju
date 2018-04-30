@@ -55,7 +55,7 @@ func CreateMAASCredsYaml(cloudName string, username string, maasOauth string) (s
 
 // SetMAASCreds will pass in maas credentials to juju add-credential
 func (j *Juju) SetMAASCreds() {
-	tmp := "JUJU_DATA=/tmp/" + j.Name
+	tmp := "JUJU_DATA=" + JujuDataPrefix + j.Name
 
 	creds, err := CreateMAASCredsYaml(j.MaasCr.CloudName, j.MaasCr.Username, j.MaasCr.MaasOauth)
 	if err != nil {
