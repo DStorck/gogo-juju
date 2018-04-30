@@ -111,7 +111,7 @@ func (j *Juju) DestroyCluster() {
 	if j.Kind == Aws {
 		controller = j.AwsCl.Region
 	} else if j.Kind == Maas {
-		controller = j.MaasCl.Type
+		controller = j.Name
 	}
 	controller = strings.Replace(controller, "/", "-", -1)
 
