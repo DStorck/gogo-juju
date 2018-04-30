@@ -52,13 +52,13 @@ func CreateMAASCloudYaml(name string, endpoint string) (string, error) {
 func (j *Juju) SetMAASCloud() {
 	tmp := "JUJU_DATA=/tmp/" + j.Name
 
-	cloudInfo, err := CreateMAASCloudYaml(j.MaasCl.Type, j.MaasCl.Endpoint)
+	cloudInfo, err := CreateMAASCloudYaml(j.Name, j.MaasCl.Endpoint)
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
 	fmt.Println(cloudInfo)
-	cmd := exec.Command("juju", "add-cloud", j.MaasCl.Type, "-f", "/dev/stdin", "--replace")
+	cmd := exec.Command("juju", "add-cloud", j.Name, "-f", "/dev/stdin", "--replace")
 	cmd.Stdin = strings.NewReader(cloudInfo)
 	cmd.Env = append(os.Environ(), tmp)
 	out, err := cmd.CombinedOutput()

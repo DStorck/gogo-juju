@@ -16,7 +16,6 @@ type Juju struct {
 	Kind   CloudKind // should be gogo.Aws or gogo.Maas - will be used to figure out which creds and cloud to set
 	Name   string
 	Bundle string // ex "cs:bundle/canonical-kubernetes-193"
-	p      Parallel
 	MaasCl MaasCloud
 	MaasCr MaasCredentials
 	AwsCl  AWSCloud
@@ -25,13 +24,11 @@ type Juju struct {
 
 // MaasCloud information
 type MaasCloud struct {
-	Type     string
 	Endpoint string
 }
 
 // MaasCredentials to be used with MaasCloud
 type MaasCredentials struct {
-	CloudName string
 	Username  string
 	MaasOauth string
 }

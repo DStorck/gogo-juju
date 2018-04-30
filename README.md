@@ -14,9 +14,9 @@ You will need to set the instance of `Juju` with the following fields:
 | Field Name     | Required    | Type            | Description                                 |
 | -------------- | ----------- | --------------- | ------------------------------------------- |
 | Kind           | __Required__| CloudKind       | must use one of the const: `Maas` or `Aws`  |
-| Name           | __Required__| String          | used to set JUJU_DATA path                  |
+| Name           | __Required__| String          | JUJU_DATA path and juju clustername for MAAS|
 | Bundle         | __Required__| String          | ex "cs:bundle/canonical-kubernetes-193"     |
-| p  						 |  Optional   | Parallel        | used for multiple cluster creation          |
+| p              |  Optional   | Parallel        | used for multiple cluster creation          |
 | MaasCl         | Optional    | MaasCloud       | maas cloud details                          |
 | MaasCr         | Optional    | MaasCredentials | maas credential details                     |
 | Aws Cl         | Optional    | AwsCloud        | aws cloud details                           |
@@ -25,13 +25,11 @@ You will need to set the instance of `Juju` with the following fields:
 ## MaasCl Options
 | Field Name     | Required    | Type            | Description                             |
 | -------------- | ----------- | --------------- | --------------------------------------- |
-| Type           |__Required__ | String          | name for your maas cloud( dev, prod )   |
 | Endpoint       |__Required__ | String          | maas url ex-"http://<ip>/MAAS/api/2.0"  |
 
 ## MaasCr Options
 | Field Name     | Required    | Type            | Description                             |
 | -------------- | ----------- | --------------- | --------------------------------------- |
-| CloudName      | __Required__| String          | must match desired MaasCl.Type cloud    |
 | Username       | __Required__| String          | maas username 													 |
 | MaasOauth      | __Required__| String          | maas oauth info                         |
 
@@ -79,11 +77,9 @@ var testRun = gogo.Juju{
 }
 
 var myMaasCloud = gogo.MaasCloud{
-	Type:     "lab",
 	Endpoint: "<your-maas-url>",
 }
 var myMaasCreds = gogo.MaasCredentials{
-	CloudName: "nuc-lab",
 	Username:  "<username>",
 	MaasOauth: "<maas-password>",
 }

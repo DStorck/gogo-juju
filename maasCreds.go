@@ -57,14 +57,14 @@ func CreateMAASCredsYaml(cloudName string, username string, maasOauth string) (s
 func (j *Juju) SetMAASCreds() {
 	tmp := "JUJU_DATA=/tmp/" + j.Name
 
-	creds, err := CreateMAASCredsYaml(j.MaasCr.CloudName, j.MaasCr.Username, j.MaasCr.MaasOauth)
+	creds, err := CreateMAASCredsYaml(j.Name, j.MaasCr.Username, j.MaasCr.MaasOauth)
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
 	fmt.Println(creds)
 
-	cmd := exec.Command("juju", "add-credential", j.MaasCl.Type, "-f", "/dev/stdin", "--replace")
+	cmd := exec.Command("juju", "add-credential", j.Name, "-f", "/dev/stdin", "--replace")
 	cmd.Stdin = strings.NewReader(creds)
 	cmd.Env = append(os.Environ(), tmp)
 	out, err := cmd.CombinedOutput()
