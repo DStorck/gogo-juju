@@ -16,11 +16,11 @@ func (j *Juju) Spinup() {
 	controller := ""
 	user := ""
 	tmp := "JUJU_DATA=/tmp/" + j.Name
-	if j.Kind == "aws" {
+	if j.Kind == Aws {
 		j.SetAWSCreds()
 		controller = j.AwsCl.Region
 		user = j.AwsCr.Username
-	} else if j.Kind == "maas" {
+	} else if j.Kind == Maas {
 		j.SetMAASCloud()
 		j.SetMAASCreds()
 		controller = j.MaasCl.Type
@@ -100,9 +100,9 @@ func (j *Juju) GetKubeConfig() {
 // DestroyCluster will kill off one cluster
 func (j *Juju) DestroyCluster() {
 	controller := ""
-	if j.Kind == "aws" {
+	if j.Kind == Aws {
 		controller = j.AwsCl.Region
-	} else if j.Kind == "maas" {
+	} else if j.Kind == Maas {
 		controller = j.MaasCl.Type
 	}
 	controller = strings.Replace(controller, "/", "-", -1)

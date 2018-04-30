@@ -11,16 +11,16 @@ You will need to set the instance of `Juju` with the following fields:
 ### Juju struct options
 * Note - While several fields are optional, you must include either `MaasCl` __and__ `MaasCr` __or__ `AwsCl` __and__ `AwsCr`
 
-| Field Name     | Required    | Type            | Description                             |
-| -------------- | ----------- | --------------- | --------------------------------------- |
-| Kind           | __Required__| String          |  must be "aws" or "maas"                |
-| Name           | __Required__| String          |  used to set JUJU_DATA path             |
-| Bundle         | __Required__| String          |  ex "cs:bundle/canonical-kubernetes-193"|
-| p  						 |  Optional   | Parallel        | used for multiple cluster creation      |
-| MaasCl         | Optional    | MaasCloud       | maas cloud details                      |
-| MaasCr         | Optional    | MaasCredentials | maas credential details                 |
-| Aws Cl         | Optional    | AwsCloud        | aws cloud details                       |
-| AwsCr          | Optional    | AwsCredentials  | aws credential details                  |  
+| Field Name     | Required    | Type            | Description                                 |
+| -------------- | ----------- | --------------- | ------------------------------------------- |
+| Kind           | __Required__| String          | must use one of the const: `Maas` or `Aws`  |
+| Name           | __Required__| String          | used to set JUJU_DATA path                  |
+| Bundle         | __Required__| String          | ex "cs:bundle/canonical-kubernetes-193"     |
+| p  						 |  Optional   | Parallel        | used for multiple cluster creation          |
+| MaasCl         | Optional    | MaasCloud       | maas cloud details                          |
+| MaasCr         | Optional    | MaasCredentials | maas credential details                     |
+| Aws Cl         | Optional    | AwsCloud        | aws cloud details                           |
+| AwsCr          | Optional    | AwsCredentials  | aws credential details                      |
 
 ## MaasCl Options
 | Field Name     | Required    | Type            | Description                             |
@@ -69,7 +69,7 @@ import (
 )
 
 var testRun = gogo.Juju{
-	Kind:   "maas",
+	Kind:   gogo.Maas,
 	Name:   "test-cluster",
 	Bundle: "cs:bundle/kubernetes-core-306",
 	MaasCl: myMaasCloud,
@@ -107,7 +107,7 @@ import (
 )
 
 var testRun = gogo.Juju{
-	Kind:   "aws",
+	Kind:   gogo.Aws,
 	Name:   "test-cluster",
 	Bundle: "cs:bundle/kubernetes-core-306",
 	AwsCr:  myAWScreds,

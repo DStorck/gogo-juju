@@ -2,9 +2,18 @@ package gogo
 
 import "sync"
 
+// CloudKind is the kind of cloud, eg. aws, maas, etc.
+type CloudKind string
+
+// Supported Cloud Kinds
+const (
+	Aws  CloudKind = "aws"
+	Maas CloudKind = "maas"
+)
+
 // Juju defines the cluster name, which bundle to use, and the manifest for credentials and cloud
 type Juju struct {
-	Kind   string // should be "maas" or "aws" - will be used to figure out which creds and cloud to set
+	Kind   CloudKind // should be gogo.Aws or gogo.Maas - will be used to figure out which creds and cloud to set
 	Name   string
 	Bundle string // ex "cs:bundle/canonical-kubernetes-193"
 	p      Parallel
