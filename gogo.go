@@ -11,11 +11,15 @@ import (
 
 var jStats jujuStatus
 
+// JujuDataPrefix is the path prefix used for the JUJU_DATA environment variable
+// this path will store required juju state and should be persistent
+var JujuDataPrefix = "/tmp/"
+
 // Spinup will create one cluster
 func (j *Juju) Spinup() {
 	controller := ""
 	user := ""
-	tmp := "JUJU_DATA=/tmp/" + j.Name
+	tmp := "JUJU_DATA=" + JujuDataPrefix + j.Name
 	if j.Kind == Aws {
 		j.SetAWSCreds()
 		controller = j.AwsCl.Region
@@ -49,7 +53,7 @@ func (j *Juju) Spinup() {
 
 // DisplayStatus will ask juju for status
 func (j *Juju) DisplayStatus() {
-	tmp := "JUJU_DATA=/tmp/" + j.Name
+	tmp := "JUJU_DATA=" + JujuDataPrefix + j.Name
 	cmd := exec.Command("juju", "status")
 	cmd.Env = append(os.Environ(), tmp)
 	out, err := cmd.CombinedOutput()
@@ -58,7 +62,7 @@ func (j *Juju) DisplayStatus() {
 
 // ClusterReady will check status and return true if cluster is running
 func (j *Juju) ClusterReady() bool {
-	tmp := "JUJU_DATA=/tmp/" + j.Name
+	tmp := "JUJU_DATA=" + JujuDataPrefix + j.Name
 	cmd := exec.Command("juju", "status", "--format=json")
 	cmd.Env = append(os.Environ(), tmp)
 	out, err := cmd.CombinedOutput()
@@ -90,7 +94,7 @@ func (j *Juju) ClusterReady() bool {
 
 // GetKubeConfig returns the kubeconfig file contents
 func (j *Juju) GetKubeConfig() ([]byte, error) {
-	tmp := "JUJU_DATA=/tmp/" + j.Name
+	tmp := "JUJU_DATA=" + JujuDataPrefix + j.Name
 	cmd := exec.Command("juju", "ssh", "kubernetes-master/0", "cat", "config")
 	cmd.Env = append(os.Environ(), tmp)
 	out, err := cmd.CombinedOutput()
@@ -110,7 +114,7 @@ func (j *Juju) DestroyCluster() {
 	}
 	controller = strings.Replace(controller, "/", "-", -1)
 
-	tmp := "JUJU_DATA=/tmp/" + j.Name
+	tmp := "JUJU_DATA=" + JujuDataPrefix + j.Name
 	cmd := exec.Command("juju", "destroy-controller", "--destroy-all-models", controller, "-y")
 	cmd.Env = append(os.Environ(), tmp)
 	out, err := cmd.CombinedOutput()

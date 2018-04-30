@@ -8,6 +8,20 @@ Currently can bring up kubernetes cluster in CNCT maas lab or on aws.
 
 You will need to set the instance of `Juju` with the following fields:
 
+### JujuDataPrefix variable
+In order to run the juju cli in discrete environments, a different JUJU_DATA path is set per 
+Juju.Name. This path prefix defaults to `/tmp` and will result in the loss of the juju cli
+state as /tmp is ephemeral. 
+
+Set this variable to a path with persistant storage:
+```
+import (
+    "github.com/dstorck/gogo"
+)
+
+gogo.JujuDataPrefix = "/data"
+```
+
 ### Juju struct options
 * Note - While several fields are optional, you must include either `MaasCl` __and__ `MaasCr` __or__ `AwsCl` __and__ `AwsCr`
 

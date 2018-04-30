@@ -50,7 +50,7 @@ func CreateMAASCloudYaml(name string, endpoint string) (string, error) {
 
 // SetMAASCloud will run juju add-cloud with maasCloud yaml created above
 func (j *Juju) SetMAASCloud() {
-	tmp := "JUJU_DATA=/tmp/" + j.Name
+	tmp := "JUJU_DATA=" + JujuDataPrefix + j.Name
 
 	cloudInfo, err := CreateMAASCloudYaml(j.MaasCl.Type, j.MaasCl.Endpoint)
 	if err != nil {
