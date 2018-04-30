@@ -10,6 +10,7 @@ import (
 )
 
 var jStats jujuStatus
+var jControllers jujuControllers
 
 // JujuDataPrefix is the path prefix used for the JUJU_DATA environment variable
 // this path will store required juju state and should be persistent
@@ -126,6 +127,24 @@ func commandResult(out []byte, err error, command string) {
 	if err != nil {
 		log.Fatalf("%s failed with %s\n", command, err)
 	}
+}
+
+// DestroyComplete checks juju for controllers to make sure none are left
+func (j *Juju) DestroyComplete() bool {
+	tmp := "JUJU_DATA=" + JujuDataPrefix + j.Name
+	cmd := exec.Command("juju", "controllers", "--format=json")
+	cmd.Env = append(os.Environ(), tmp)
+	out, err := cmd.CombinedOutput()
+	if err != nil {
+		log.Fatalf("DestroyComplete() failed with %s\n", err)
+	}
+
+	json.Unmarshal([]byte(out), &jControllers)
+	length := len(jControllers.Controllers)
+	if length == 0 {
+		return true
+	}
+	return false
 }
 
 // Create is an example of spinning up multiple clusters
