@@ -88,13 +88,16 @@ func (j *Juju) ClusterReady() bool {
 	return true
 }
 
-// GetKubeConfig will cat out kubernetes config to stdout
-func (j *Juju) GetKubeConfig() {
+// GetKubeConfig returns the kubeconfig file contents
+func (j *Juju) GetKubeConfig() ([]byte, error) {
 	tmp := "JUJU_DATA=/tmp/" + j.Name
 	cmd := exec.Command("juju", "ssh", "kubernetes-master/0", "cat", "config")
 	cmd.Env = append(os.Environ(), tmp)
 	out, err := cmd.CombinedOutput()
-	commandResult(out, err, "get kube config")
+	if err != nil {
+		return []byte{}, fmt.Errorf("GetKubeConfig failed: %s", err)
+	}
+	return out, nil
 }
 
 // DestroyCluster will kill off one cluster

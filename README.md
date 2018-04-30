@@ -55,7 +55,7 @@ You will need to set the instance of `Juju` with the following fields:
 - `Spinup()` - will spinup cluster from specified creds/cloud/bundle
 - `DisplayStatus()` - will display results of running juju status
 - `ClusterReady()` - will return boolean corresponding to readiness of cluster
-- `GetKubeConfig()` - will print out kubeconfig to stdout
+- `GetKubeConfig()` - return the contents of the kubeconfig file
 - `DestroyCluster()` - will tear down juju controller and associated cluster
 
 
@@ -65,6 +65,8 @@ You will need to set the instance of `Juju` with the following fields:
 package main
 
 import (
+	"fmt"
+
 	"github.com/dstorck/gogo"
 )
 
@@ -93,7 +95,8 @@ func main() {
   testRun.Spinup()
   testRun.DisplayStatus()
   testRun.ClusterReady()
-  testRun.GetKubeConfig()
+  config,_ := testRun.GetKubeConfig()
+	fmt.Println(string(config))
   testRun.DestroyCluster()
 }
 ```
