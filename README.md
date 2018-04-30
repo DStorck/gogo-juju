@@ -19,7 +19,7 @@ You will need to set the instance of `Juju` with the following fields:
 | p  						 |  Optional   | Parallel        | used for multiple cluster creation          |
 | MaasCl         | Optional    | MaasCloud       | maas cloud details                          |
 | MaasCr         | Optional    | MaasCredentials | maas credential details                     |
-| Aws Cl         | Optional    | AwsCloud        | aws cloud details                           |
+| AwsCl          | Optional    | AwsCloud        | aws cloud details                           |
 | AwsCr          | Optional    | AwsCredentials  | aws credential details                      |
 
 ## MaasCl Options
@@ -33,7 +33,7 @@ You will need to set the instance of `Juju` with the following fields:
 | -------------- | ----------- | --------------- | --------------------------------------- |
 | CloudName      | __Required__| String          | must match desired MaasCl.Type cloud    |
 | Username       | __Required__| String          | maas username 													 |
-| MaasOauth      | __Required__| String          | maas oauth info                         |
+| MaasOauth      | __Required__| String          | maas api key                            |
 
 ## AwsCl Options
 | Field Name     | Required    | Type            | Description                             |
@@ -85,7 +85,7 @@ var myMaasCloud = gogo.MaasCloud{
 var myMaasCreds = gogo.MaasCredentials{
 	CloudName: "nuc-lab",
 	Username:  "<username>",
-	MaasOauth: "<maas-password>",
+	MaasOauth: "<maas-api-key>",
 }
 
 // current available commands, not meant to be run all at once
