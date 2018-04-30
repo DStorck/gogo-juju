@@ -127,7 +127,7 @@ func commandResult(out []byte, err error, command string) {
 
 // DestroyComplete checks juju for controllers to make sure none are left
 func (j *Juju) DestroyComplete() bool {
-	tmp := "JUJU_DATA=/tmp/" + j.Name
+	tmp := "JUJU_DATA=" + JujuDataPrefix + j.Name
 	cmd := exec.Command("juju", "controllers", "--format=json")
 	cmd.Env = append(os.Environ(), tmp)
 	out, err := cmd.CombinedOutput()

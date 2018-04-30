@@ -68,7 +68,7 @@ type applications struct {
 	AppStatus map[string]string `json:"application-status"`
 }
 
-// for user with json parsing with DestroyComplete
+// for use with json parsing with DestroyComplete
 type jujuControllers struct {
 	Controllers map[string]string `json:"controllers"`
 }
