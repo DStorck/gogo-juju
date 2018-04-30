@@ -1,5 +1,5 @@
 # GO Library to use JUJU commands to bring up a Kubernetes cluster
-
+[![Go Report Card](https://goreportcard.com/badge/github.com/DStorck/gogo)](https://goreportcard.com/report/github.com/DStorck/gogo)
 ### Pre-reqs
 `go get gopkg.in/yaml.v2`
 
