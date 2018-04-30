@@ -58,7 +58,7 @@ func (j *Juju) SetMAASCloud() {
 		return
 	}
 	fmt.Println(cloudInfo)
-	cmd := exec.Command("juju", "add-cloud", "lab", "-f", "/dev/stdin", "--replace")
+	cmd := exec.Command("juju", "add-cloud", j.MaasCl.Type, "-f", "/dev/stdin", "--replace")
 	cmd.Stdin = strings.NewReader(cloudInfo)
 	cmd.Env = append(os.Environ(), tmp)
 	out, err := cmd.CombinedOutput()

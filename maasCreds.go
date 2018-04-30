@@ -64,7 +64,7 @@ func (j *Juju) SetMAASCreds() {
 	}
 	fmt.Println(creds)
 
-	cmd := exec.Command("juju", "add-credential", "lab", "-f", "/dev/stdin", "--replace")
+	cmd := exec.Command("juju", "add-credential", j.MaasCl.Type, "-f", "/dev/stdin", "--replace")
 	cmd.Stdin = strings.NewReader(creds)
 	cmd.Env = append(os.Environ(), tmp)
 	out, err := cmd.CombinedOutput()
