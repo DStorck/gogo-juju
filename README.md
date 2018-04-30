@@ -65,7 +65,7 @@ gogo.JujuDataPrefix = "/data"
 - `SetMAASCreds()` sets maas credentials for use with juju
 - `SetMAASCloud()` - sets maas cloud information for use with juju
 - `Spinup()` - will spinup cluster from specified creds/cloud/bundle
-- `DisplayStatus()` - will display results of running juju status
+- `GetStatus()` - will return results of running juju status
 - `ClusterReady()` - will return boolean corresponding to readiness of cluster
 - `GetKubeConfig()` - return the contents of the kubeconfig file
 - `DestroyCluster()` - will tear down juju controller and associated cluster
@@ -104,7 +104,8 @@ func main() {
   testRun.SetMAASCreds()
   testRun.SetMAASCloud()
   testRun.Spinup()
-  testRun.DisplayStatus()
+  status, _ := testRun.GetStatus()
+	fmt.Println(status)
   testRun.ClusterReady()
   config,_ := testRun.GetKubeConfig()
 	fmt.Println(string(config))
@@ -141,7 +142,7 @@ var myAWScloud = gogo.AWSCloud{
 // currently available commands, not meant to be run all at once
 func main() {
   // testRun.SetAWSCreds()
-  // testRun.DisplayStatus()
+  // testRun.GetStatus()
   // testRun.Spinup()
   // testRun.ClusterReady()
   // testRun.GetKubeConfig()
