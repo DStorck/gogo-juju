@@ -13,7 +13,7 @@ You will need to set the instance of `Juju` with the following fields:
 
 | Field Name     | Required    | Type            | Description                                 |
 | -------------- | ----------- | --------------- | ------------------------------------------- |
-| Kind           | __Required__| String          | must use one of the const: `Maas` or `Aws`  |
+| Kind           | __Required__| CloudKind       | must use one of the const: `Maas` or `Aws`  |
 | Name           | __Required__| String          | used to set JUJU_DATA path                  |
 | Bundle         | __Required__| String          | ex "cs:bundle/canonical-kubernetes-193"     |
 | p  						 |  Optional   | Parallel        | used for multiple cluster creation          |
