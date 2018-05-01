@@ -28,7 +28,7 @@ func (j *Juju) Spinup() {
 	} else if j.Kind == Maas {
 		j.SetMAASCloud()
 		j.SetMAASCreds()
-		controller = j.MaasCl.Type
+		controller = j.Name
 		user = j.MaasCr.Username
 	}
 
