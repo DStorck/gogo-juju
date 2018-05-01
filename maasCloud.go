@@ -49,18 +49,20 @@ func CreateMAASCloudYaml(name string, endpoint string) (string, error) {
 }
 
 // SetMAASCloud will run juju add-cloud with maasCloud yaml created above
-func (j *Juju) SetMAASCloud() {
+func (j *Juju) SetMAASCloud() error {
 	tmp := "JUJU_DATA=" + JujuDataPrefix + j.Name
 
 	cloudInfo, err := CreateMAASCloudYaml(j.Name, j.MaasCl.Endpoint)
 	if err != nil {
-		fmt.Println(err)
-		return
+		return fmt.Errorf("setMAASCloud error: %s", err)
 	}
 	fmt.Println(cloudInfo)
 	cmd := exec.Command("juju", "add-cloud", j.Name, "-f", "/dev/stdin", "--replace")
 	cmd.Stdin = strings.NewReader(cloudInfo)
 	cmd.Env = append(os.Environ(), tmp)
-	out, err := cmd.CombinedOutput()
-	commandResult(out, err, "add-cloud")
+	_, err = cmd.CombinedOutput()
+	if err != nil {
+		return fmt.Errorf("setMAASCloud error: %s", err)
+	}
+	return nil
 }

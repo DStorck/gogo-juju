@@ -2,11 +2,13 @@ package gogo
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
-	"log"
 	"os"
 	"os/exec"
 	"strings"
+
+	"github.com/sirupsen/logrus"
 )
 
 var jStats jujuStatus
@@ -16,81 +18,110 @@ var jControllers jujuControllers
 // this path will store required juju state and should be persistent
 var JujuDataPrefix = "/tmp/"
 
+var log = logrus.New()
+
 // Spinup will create one cluster
-func (j *Juju) Spinup() {
-	controller := ""
-	user := ""
+func (j *Juju) Spinup() error {
+	var controller string
+	var user string
 	tmp := "JUJU_DATA=" + JujuDataPrefix + j.Name
 	if j.Kind == Aws {
-		j.SetAWSCreds()
+		err := j.SetAWSCreds()
+		if err != nil {
+			return fmt.Errorf("Spinup error: %s", err)
+		}
 		controller = j.AwsCl.Region
 		user = j.AwsCr.Username
 	} else if j.Kind == Maas {
-		j.SetMAASCloud()
-		j.SetMAASCreds()
+		err := j.SetMAASCloud()
+		if err != nil {
+			return fmt.Errorf("Spinup error: %s", err)
+		}
+		err = j.SetMAASCreds()
+		if err != nil {
+			return fmt.Errorf("Spinup error: %s", err)
+		}
 		controller = j.Name
 		user = j.MaasCr.Username
+	} else {
+		return errors.New("DestroyCluster: Juju.Kind must be a supported cloud")
 	}
 
 	credscommand := "--credential=" + user
 
 	cmd := exec.Command("juju", "bootstrap", controller, credscommand)
-
-	// cmd := exec.Command("juju", "bootstrap", controller) // with aws this is is expecting region ex - juju bootstrap aws/us-west-2
 	cmd.Env = append(os.Environ(), tmp)
 	out, err := cmd.CombinedOutput()
-	commandResult(out, err, "bootstrap")
+	if err != nil {
+		return fmt.Errorf("Spinup error: %s", err)
+	}
+	log.Debug(string(out))
 
 	cmd = exec.Command("juju", "add-model", j.Name, credscommand)
 	cmd.Env = append(os.Environ(), tmp)
 	out, err = cmd.CombinedOutput()
-	commandResult(out, err, "add-model")
+	if err != nil {
+		return fmt.Errorf("Spinup error: %s", err)
+	}
+	log.Debug(string(out))
 
 	cmd = exec.Command("juju", "deploy", j.Bundle)
 	cmd.Env = append(os.Environ(), tmp)
 	out, err = cmd.CombinedOutput()
-	commandResult(out, err, "deploy")
+	if err != nil {
+		return fmt.Errorf("Spinup error: %s", err)
+	}
+	log.Debug(string(out))
+
+	return nil
 }
 
 // DisplayStatus will ask juju for status
-func (j *Juju) DisplayStatus() {
+func (j *Juju) DisplayStatus() error {
 	tmp := "JUJU_DATA=" + JujuDataPrefix + j.Name
 	cmd := exec.Command("juju", "status")
 	cmd.Env = append(os.Environ(), tmp)
 	out, err := cmd.CombinedOutput()
-	commandResult(out, err, "display status")
+	if err != nil {
+		return fmt.Errorf("DisplayStatus error: %s", err)
+	}
+	log.Debug(string(out))
+	return nil
 }
 
 // ClusterReady will check status and return true if cluster is running
-func (j *Juju) ClusterReady() bool {
+func (j *Juju) ClusterReady() (bool, error) {
 	tmp := "JUJU_DATA=" + JujuDataPrefix + j.Name
 	cmd := exec.Command("juju", "status", "--format=json")
 	cmd.Env = append(os.Environ(), tmp)
 	out, err := cmd.CombinedOutput()
 	if err != nil {
-		log.Fatalf("ClusterReady() failed with %s\n", err)
+		return false, fmt.Errorf("ClusterReady error: %s", err)
 	}
 
-	json.Unmarshal([]byte(out), &jStats)
+	err = json.Unmarshal([]byte(out), &jStats)
+	if err != nil {
+		return false, fmt.Errorf("ClusterReady error: %s", err)
+	}
 
 	for k := range jStats.Machines {
 		machineStatus := jStats.Machines[k].MachStatus["current"]
 		if machineStatus != "started" {
-			fmt.Println("Cluster Not Ready")
-			return false
+			log.WithFields(logrus.Fields{"name": j.Name}).Info("Cluster Not Ready")
+			return false, nil
 		}
 	}
 
 	for k := range jStats.ApplicationResults {
 		appStatus := jStats.ApplicationResults[k].AppStatus["current"]
 		if appStatus != "active" {
-			fmt.Println("Cluster Not Ready")
-			return false
+			log.WithFields(logrus.Fields{"name": j.Name}).Info("Cluster Not Ready")
+			return false, nil
 		}
 	}
 
-	fmt.Println("Cluster Ready")
-	return true
+	log.WithFields(logrus.Fields{"name": j.Name}).Info("Cluster Ready")
+	return true, nil
 }
 
 // GetKubeConfig returns the kubeconfig file contents
@@ -106,12 +137,14 @@ func (j *Juju) GetKubeConfig() ([]byte, error) {
 }
 
 // DestroyCluster will kill off one cluster
-func (j *Juju) DestroyCluster() {
+func (j *Juju) DestroyCluster() error {
 	controller := ""
 	if j.Kind == Aws {
 		controller = j.AwsCl.Region
 	} else if j.Kind == Maas {
 		controller = j.Name
+	} else {
+		return errors.New("DestroyCluster: Juju.Kind must be a supported cloud")
 	}
 	controller = strings.Replace(controller, "/", "-", -1)
 
@@ -119,41 +152,31 @@ func (j *Juju) DestroyCluster() {
 	cmd := exec.Command("juju", "destroy-controller", "--destroy-all-models", controller, "-y")
 	cmd.Env = append(os.Environ(), tmp)
 	out, err := cmd.CombinedOutput()
-	commandResult(out, err, "destroy-controller")
-}
-
-func commandResult(out []byte, err error, command string) {
-	fmt.Printf("\n%s\n", string(out))
 	if err != nil {
-		log.Fatalf("%s failed with %s\n", command, err)
+		return fmt.Errorf("DestroyCluster error: %s", err)
 	}
+	log.Debug(string(out))
+	return nil
 }
 
 // DestroyComplete checks juju for controllers to make sure none are left
-func (j *Juju) DestroyComplete() bool {
+func (j *Juju) DestroyComplete() (bool, error) {
 	tmp := "JUJU_DATA=" + JujuDataPrefix + j.Name
 	cmd := exec.Command("juju", "controllers", "--format=json")
 	cmd.Env = append(os.Environ(), tmp)
 	out, err := cmd.CombinedOutput()
 	if err != nil {
-		log.Fatalf("DestroyComplete() failed with %s\n", err)
+		return false, fmt.Errorf("DestroyComplete error: %s", err)
 	}
 
-	json.Unmarshal([]byte(out), &jControllers)
-	length := len(jControllers.Controllers)
-	if length == 0 {
-		return true
+	err = json.Unmarshal([]byte(out), &jControllers)
+	if err != nil {
+		return false, fmt.Errorf("DestroyComplete error: %s", err)
 	}
-	return false
-}
 
-// Create is an example of spinning up multiple clusters
-func (j *Juju) Create(clusters []string) {
-	// clusters := []string{"d8048274-2bc6-49bf-81fd-846aeaddf2fe", "97c19eda-7aeb-4eee-a35c-57dc3755d98f"}
-
-	// for _, cluster := range clusters {
-	// 	j.p.wg.Add(1)
-	// 	go j.Spinup()
-	// }
-	// j.p.wg.Wait()
+	log.Debugf("DestroyComplete: %+v", jControllers)
+	if len(jControllers.Controllers) < 1 {
+		return true, nil
+	}
+	return false, nil
 }

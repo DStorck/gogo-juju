@@ -54,19 +54,21 @@ func CreateMAASCredsYaml(cloudName string, username string, maasOauth string) (s
 }
 
 // SetMAASCreds will pass in maas credentials to juju add-credential
-func (j *Juju) SetMAASCreds() {
+func (j *Juju) SetMAASCreds() error {
 	tmp := "JUJU_DATA=" + JujuDataPrefix + j.Name
 
 	creds, err := CreateMAASCredsYaml(j.Name, j.MaasCr.Username, j.MaasCr.MaasOauth)
 	if err != nil {
-		fmt.Println(err)
-		return
+		return fmt.Errorf("setMAASCreds error: %s", err)
 	}
 	fmt.Println(creds)
 
 	cmd := exec.Command("juju", "add-credential", j.Name, "-f", "/dev/stdin", "--replace")
 	cmd.Stdin = strings.NewReader(creds)
 	cmd.Env = append(os.Environ(), tmp)
-	out, err := cmd.CombinedOutput()
-	commandResult(out, err, "add-credential")
+	_, err = cmd.CombinedOutput()
+	if err != nil {
+		return fmt.Errorf("setMAASCreds error: %s", err)
+	}
+	return nil
 }
