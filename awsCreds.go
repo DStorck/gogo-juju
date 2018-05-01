@@ -56,19 +56,21 @@ func CreateAWSCredsYaml(username string, accessKey string, secretKey string) (st
 }
 
 // SetAWSCreds will grab and credential information and set it
-func (j *Juju) SetAWSCreds() {
+func (j *Juju) SetAWSCreds() error {
 	tmp := "JUJU_DATA=" + JujuDataPrefix + j.Name
 
 	creds, err := CreateAWSCredsYaml(j.AwsCr.Username, j.AwsCr.AccessKey, j.AwsCr.SecretKey)
 	if err != nil {
-		fmt.Println(err)
-		return
+		return fmt.Errorf("SetAWSCreds error: %s", err)
 	}
 	fmt.Println(creds)
 
 	cmd := exec.Command("juju", "add-credential", "aws", "-f", "/dev/stdin", "--replace")
 	cmd.Stdin = strings.NewReader(creds)
 	cmd.Env = append(os.Environ(), tmp)
-	out, err := cmd.CombinedOutput()
-	commandResult(out, err, "add-credential")
+	_, err = cmd.CombinedOutput()
+	if err != nil {
+		return fmt.Errorf("SetAWSCreds error: %s", err)
+	}
+	return nil
 }
