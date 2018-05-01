@@ -76,17 +76,17 @@ func (j *Juju) Spinup() error {
 	return nil
 }
 
-// DisplayStatus will ask juju for status
-func (j *Juju) DisplayStatus() error {
+// GetStatus return juju status
+func (j *Juju) GetStatus() (string, error) {
 	tmp := "JUJU_DATA=" + JujuDataPrefix + j.Name
 	cmd := exec.Command("juju", "status")
 	cmd.Env = append(os.Environ(), tmp)
 	out, err := cmd.CombinedOutput()
 	if err != nil {
-		return fmt.Errorf("DisplayStatus error: %s", err)
+		return "", fmt.Errorf("GetStatus error: %s", err)
 	}
 	log.Debug(string(out))
-	return nil
+	return string(out), nil
 }
 
 // ClusterReady will check status and return true if cluster is running
