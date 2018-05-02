@@ -69,3 +69,7 @@ type applications struct {
 type jujuControllers struct {
 	Controllers map[string]interface{} `json:"controllers"`
 }
+
+type jujuModels struct {
+	Models map[string]string `json:models`
+}
