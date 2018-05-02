@@ -67,5 +67,5 @@ type applications struct {
 
 // for use with json parsing with DestroyComplete
 type jujuControllers struct {
-	Controllers map[string]string `json:"controllers"`
+	Controllers map[string]interface{} `json:"controllers"`
 }
