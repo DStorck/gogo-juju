@@ -29,18 +29,18 @@ func (j *Juju) Spinup() error {
 	if j.Kind == Aws {
 		err := j.SetAWSCreds()
 		if err != nil {
-			return fmt.Errorf("Spinup error: %s", err)
+			return fmt.Errorf("Spinup error with setAwsCreds: %s", err)
 		}
 		controller = j.AwsCl.Region
 		user = j.AwsCr.Username
 	} else if j.Kind == Maas {
 		err := j.SetMAASCloud()
 		if err != nil {
-			return fmt.Errorf("Spinup error: %s", err)
+			return fmt.Errorf("Spinup error with setMaasCloud: %s", err)
 		}
 		err = j.SetMAASCreds()
 		if err != nil {
-			return fmt.Errorf("Spinup error: %s", err)
+			return fmt.Errorf("Spinup error with setMaasCreds: %s", err)
 		}
 		controller = j.Name
 		user = j.MaasCr.Username
@@ -54,7 +54,7 @@ func (j *Juju) Spinup() error {
 	cmd.Env = append(os.Environ(), tmp)
 	out, err := cmd.CombinedOutput()
 	if err != nil {
-		return fmt.Errorf("Spinup error: %s", err)
+		return fmt.Errorf("Spinup error with bootstrap: %s", err)
 	}
 	log.Debug(string(out))
 
@@ -62,7 +62,7 @@ func (j *Juju) Spinup() error {
 	cmd.Env = append(os.Environ(), tmp)
 	out, err = cmd.CombinedOutput()
 	if err != nil {
-		return fmt.Errorf("Spinup error: %s", err)
+		return fmt.Errorf("Spinup error with add-model: %s", err)
 	}
 	log.Debug(string(out))
 
@@ -70,7 +70,7 @@ func (j *Juju) Spinup() error {
 	cmd.Env = append(os.Environ(), tmp)
 	out, err = cmd.CombinedOutput()
 	if err != nil {
-		return fmt.Errorf("Spinup error: %s", err)
+		return fmt.Errorf("Spinup error with deploy: %s", err)
 	}
 	log.Debug(string(out))
 
