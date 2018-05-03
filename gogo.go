@@ -77,8 +77,8 @@ func (j *Juju) Spinup() error {
 	return nil
 }
 
+// ControllerReady checks model status and returns bool
 func (j *Juju) ControllerReady() (bool, error) {
-	fmt.Println("in CReady\n")
 	tmp := "JUJU_DATA=" + JujuDataPrefix + j.Name
 	cmd := exec.Command("juju", "models", "--format=json")
 	cmd.Env = append(os.Environ(), tmp)
@@ -89,17 +89,19 @@ func (j *Juju) ControllerReady() (bool, error) {
 
 	err = json.Unmarshal([]byte(out), &jModels)
 	if err != nil {
-		return false, fmt.Errorf("ControllerReady error: %s", err)
+		return false, fmt.Errorf("ControllerReady unmarshal error: %s", err)
 	}
 
 	log.Debugf("ControllerReady: %+v", jModels)
-	fmt.Println("yeah change\n")
-	fmt.Printf("jModel info: %v", jModels)
+	for k := range jModels.Models {
+		if jModels.Models[k].ShortName == j.Name {
+			status := jModels.Models[k].Status["current"]
+			if status == "available" {
+				return true, nil
+			}
+		}
+	}
 	return false, nil
-	// if len(jControllers.Controllers) < 1 {
-	// 	return true, nil
-	// }
-	// return false, nil
 }
 
 // GetStatus return juju status
