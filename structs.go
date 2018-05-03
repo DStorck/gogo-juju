@@ -69,3 +69,13 @@ type applications struct {
 type jujuControllers struct {
 	Controllers map[string]interface{} `json:"controllers"`
 }
+
+// for use with json parsing with ControllerReady
+type jujuModels struct {
+	Models []model `json:"models"`
+}
+
+type model struct {
+	ShortName string            `json:"short-name"`
+	Status    map[string]string `json:"status"`
+}

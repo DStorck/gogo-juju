@@ -13,6 +13,7 @@ import (
 
 var jStats jujuStatus
 var jControllers jujuControllers
+var jModels jujuModels
 
 // JujuDataPrefix is the path prefix used for the JUJU_DATA environment variable
 // this path will store required juju state and should be persistent
@@ -74,6 +75,35 @@ func (j *Juju) Spinup() error {
 	log.Debug(string(out))
 
 	return nil
+}
+
+// ControllerReady checks model status and returns bool
+func (j *Juju) ControllerReady() (bool, error) {
+	tmp := "JUJU_DATA=" + JujuDataPrefix + j.Name
+	cmd := exec.Command("juju", "models", "--format=json")
+	cmd.Env = append(os.Environ(), tmp)
+	out, err := cmd.CombinedOutput()
+	if err != nil {
+		return false, fmt.Errorf("ControllerReady error: %s", err)
+	}
+
+	err = json.Unmarshal([]byte(out), &jModels)
+	if err != nil {
+		return false, fmt.Errorf("ControllerReady unmarshal error: %s", err)
+	}
+
+	log.Debugf("ControllerReady: %+v", jModels)
+	for k := range jModels.Models {
+		if jModels.Models[k].ShortName == j.Name {
+			status := jModels.Models[k].Status["current"]
+			if status == "available" {
+				log.WithFields(logrus.Fields{"name": j.Name}).Info("Controller Ready")
+				return true, nil
+			}
+		}
+	}
+	log.WithFields(logrus.Fields{"name": j.Name}).Info("Controller Not Ready")
+	return false, nil
 }
 
 // GetStatus return juju status
