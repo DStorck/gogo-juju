@@ -97,10 +97,12 @@ func (j *Juju) ControllerReady() (bool, error) {
 		if jModels.Models[k].ShortName == j.Name {
 			status := jModels.Models[k].Status["current"]
 			if status == "available" {
+				log.WithFields(logrus.Fields{"name": j.Name}).Info("Controller Ready")
 				return true, nil
 			}
 		}
 	}
+	log.WithFields(logrus.Fields{"name": j.Name}).Info("Controller Not Ready")
 	return false, nil
 }
 
