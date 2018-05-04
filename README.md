@@ -9,9 +9,9 @@ Currently can bring up kubernetes cluster in CNCT maas lab or on aws.
 You will need to set the instance of `Juju` with the following fields:
 
 ### JujuDataPrefix variable
-In order to run the juju cli in discrete environments, a different JUJU_DATA path is set per 
+In order to run the juju cli in discrete environments, a different JUJU_DATA path is set per
 Juju.Name. This path prefix defaults to `/tmp` and will result in the loss of the juju cli
-state as /tmp is ephemeral. 
+state as /tmp is ephemeral.
 
 Set this variable to a path with persistant storage:
 ```
@@ -39,7 +39,7 @@ gogo.JujuDataPrefix = "/data"
 ## MaasCl Options
 | Field Name     | Required    | Type            | Description                             |
 | -------------- | ----------- | --------------- | --------------------------------------- |
-| Endpoint       |__Required__ | String          | maas url ex-"http://<ip>/MAAS/api/2.0"  |
+| Endpoint       |__Required__ | String          | maas url ex-"http://your-ip/MAAS/api/2.0"  |
 
 ## MaasCr Options
 | Field Name     | Required    | Type            | Description                             |
@@ -64,12 +64,13 @@ gogo.JujuDataPrefix = "/data"
 - `SetAWSCreds()` - sets aws credentials for use with juju
 - `SetMAASCreds()` sets maas credentials for use with juju
 - `SetMAASCloud()` - sets maas cloud information for use with juju
-- `Spinup()` - will spinup cluster from specified creds/cloud/bundle
-- `GetStatus()` - will return results of running juju status
-- `ClusterReady()` - will return boolean corresponding to readiness of cluster
-- `GetKubeConfig()` - return the contents of the kubeconfig file
-- `DestroyCluster()` - will tear down juju controller and associated cluster
-- `DestroyComplete()` will return boolean corresponding to destruction of cluster 
+- `Spinup()` - spins up cluster from specified creds/cloud/bundle (includes setting cloud and credentials)
+- `ControllerReady()` - returns boolean with status of controller availability
+- `GetStatus()` - returns result of running juju status
+- `ClusterReady()` - returns boolean corresponding to readiness of cluster
+- `GetKubeConfig()` - returns the contents of the kubeconfig file
+- `DestroyCluster()` - tears down juju controller and associated cluster
+- `DestroyComplete()` returns boolean corresponding to successful destruction of cluster
 
 
 ### Sample file to bring up maas cluster on Samsung's CNCT nuc lab:
@@ -110,6 +111,7 @@ func main() {
   config,_ := testRun.GetKubeConfig()
 	fmt.Println(string(config))
   testRun.DestroyCluster()
+  testRun.DestroyComplete()
 }
 ```
 
@@ -144,8 +146,10 @@ func main() {
   // testRun.SetAWSCreds()
   // testRun.GetStatus()
   // testRun.Spinup()
+  // testRun.ControllerReady()
   // testRun.ClusterReady()
   // testRun.GetKubeConfig()
   // testRun.DestroyCluster()
+  // testRun.DestroyComplete()
 }
 ```
