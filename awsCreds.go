@@ -68,7 +68,7 @@ func (j *Juju) SetAWSCreds() error {
 	cmd := exec.Command("juju", "add-credential", "aws", "-f", "/dev/stdin", "--replace")
 	cmd.Stdin = strings.NewReader(creds)
 	cmd.Env = append(os.Environ(), tmp)
-	_, err = cmd.CombinedOutput()
+	err = cmd.Run()
 	if err != nil {
 		return fmt.Errorf("SetAWSCreds error: %s", err)
 	}

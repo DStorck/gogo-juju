@@ -60,7 +60,7 @@ func (j *Juju) SetMAASCloud() error {
 	cmd := exec.Command("juju", "add-cloud", j.Name, "-f", "/dev/stdin", "--replace")
 	cmd.Stdin = strings.NewReader(cloudInfo)
 	cmd.Env = append(os.Environ(), tmp)
-	_, err = cmd.CombinedOutput()
+	err = cmd.Run()
 	if err != nil {
 		return fmt.Errorf("setMAASCloud error: %s", err)
 	}

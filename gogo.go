@@ -52,7 +52,7 @@ func (j *Juju) Spinup() error {
 
 	cmd := exec.Command("juju", "bootstrap", controller, credscommand)
 	cmd.Env = append(os.Environ(), tmp)
-	out, err := cmd.CombinedOutput()
+	out, err := cmd.Output()
 	if err != nil {
 		return fmt.Errorf("Spinup error with bootstrap: %s", err)
 	}
@@ -60,7 +60,7 @@ func (j *Juju) Spinup() error {
 
 	cmd = exec.Command("juju", "add-model", j.Name, credscommand)
 	cmd.Env = append(os.Environ(), tmp)
-	out, err = cmd.CombinedOutput()
+	out, err = cmd.Output()
 	if err != nil {
 		return fmt.Errorf("Spinup error with add-model: %s", err)
 	}
@@ -68,7 +68,7 @@ func (j *Juju) Spinup() error {
 
 	cmd = exec.Command("juju", "deploy", j.Bundle)
 	cmd.Env = append(os.Environ(), tmp)
-	out, err = cmd.CombinedOutput()
+	out, err = cmd.Output()
 	if err != nil {
 		return fmt.Errorf("Spinup error with deploy: %s", err)
 	}
@@ -82,7 +82,7 @@ func (j *Juju) ControllerReady() (bool, error) {
 	tmp := "JUJU_DATA=" + JujuDataPrefix + j.Name
 	cmd := exec.Command("juju", "models", "--format=json")
 	cmd.Env = append(os.Environ(), tmp)
-	out, err := cmd.CombinedOutput()
+	out, err := cmd.Output()
 	if err != nil {
 		return false, fmt.Errorf("ControllerReady error: %s", err)
 	}
@@ -111,7 +111,7 @@ func (j *Juju) GetStatus() (string, error) {
 	tmp := "JUJU_DATA=" + JujuDataPrefix + j.Name
 	cmd := exec.Command("juju", "status")
 	cmd.Env = append(os.Environ(), tmp)
-	out, err := cmd.CombinedOutput()
+	out, err := cmd.Output()
 	if err != nil {
 		return "", fmt.Errorf("GetStatus error: %s", err)
 	}
@@ -124,7 +124,7 @@ func (j *Juju) ClusterReady() (bool, error) {
 	tmp := "JUJU_DATA=" + JujuDataPrefix + j.Name
 	cmd := exec.Command("juju", "status", "--format=json")
 	cmd.Env = append(os.Environ(), tmp)
-	out, err := cmd.CombinedOutput()
+	out, err := cmd.Output()
 	if err != nil {
 		return false, fmt.Errorf("ClusterReady error: %s", err)
 	}
@@ -159,7 +159,7 @@ func (j *Juju) GetKubeConfig() ([]byte, error) {
 	tmp := "JUJU_DATA=" + JujuDataPrefix + j.Name
 	cmd := exec.Command("juju", "ssh", "kubernetes-master/0", "cat", "config")
 	cmd.Env = append(os.Environ(), tmp)
-	out, err := cmd.CombinedOutput()
+	out, err := cmd.Output()
 	if err != nil {
 		return []byte{}, fmt.Errorf("GetKubeConfig failed: %s", err)
 	}
@@ -181,7 +181,7 @@ func (j *Juju) DestroyCluster() error {
 	tmp := "JUJU_DATA=" + JujuDataPrefix + j.Name
 	cmd := exec.Command("juju", "destroy-controller", "--destroy-all-models", controller, "-y")
 	cmd.Env = append(os.Environ(), tmp)
-	out, err := cmd.CombinedOutput()
+	out, err := cmd.Output()
 	if err != nil {
 		return fmt.Errorf("DestroyCluster error: %s", err)
 	}
@@ -194,7 +194,7 @@ func (j *Juju) DestroyComplete() (bool, error) {
 	tmp := "JUJU_DATA=" + JujuDataPrefix + j.Name
 	cmd := exec.Command("juju", "controllers", "--format=json")
 	cmd.Env = append(os.Environ(), tmp)
-	out, err := cmd.CombinedOutput()
+	out, err := cmd.Output()
 	if err != nil {
 		return false, fmt.Errorf("DestroyComplete error: %s", err)
 	}

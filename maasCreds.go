@@ -66,7 +66,7 @@ func (j *Juju) SetMAASCreds() error {
 	cmd := exec.Command("juju", "add-credential", j.Name, "-f", "/dev/stdin", "--replace")
 	cmd.Stdin = strings.NewReader(creds)
 	cmd.Env = append(os.Environ(), tmp)
-	_, err = cmd.CombinedOutput()
+	err = cmd.Run()
 	if err != nil {
 		return fmt.Errorf("setMAASCreds error: %s", err)
 	}
