@@ -1,2 +1,4 @@
-# not including vendor files 
+.vscode/
+
+# not including vendor files
 /vendor
