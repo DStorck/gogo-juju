@@ -70,7 +70,7 @@ func (j *Juju) SetAWSCreds() error {
 	cmd.Env = append(os.Environ(), tmp)
 	err = cmd.Run()
 	if err != nil {
-		return fmt.Errorf("SetAWSCreds error: %s", err)
+		return fmt.Errorf("SetAWSCreds error: %v: %s", err, err.(*exec.ExitError).Stderr)
 	}
 	return nil
 }
