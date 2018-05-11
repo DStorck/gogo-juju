@@ -45,7 +45,7 @@ func (j *Juju) Spinup() error {
 		controller = j.Name
 		user = j.MaasCr.Username
 	} else {
-		return errors.New("DestroyCluster: Juju.Kind must be a supported cloud")
+		return errors.New("Spinup error: Juju.Kind must be a supported cloud")
 	}
 
 	credscommand := "--credential=" + user
