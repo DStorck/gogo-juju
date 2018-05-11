@@ -68,7 +68,7 @@ func (j *Juju) SetMAASCreds() error {
 	cmd.Env = append(os.Environ(), tmp)
 	err = cmd.Run()
 	if err != nil {
-		return fmt.Errorf("setMAASCreds error: %s", err)
+		return fmt.Errorf("setMAASCreds error: %v: %s", err, err.(*exec.ExitError).Stderr)
 	}
 	return nil
 }

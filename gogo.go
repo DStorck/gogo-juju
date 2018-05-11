@@ -45,7 +45,7 @@ func (j *Juju) Spinup() error {
 		controller = j.Name
 		user = j.MaasCr.Username
 	} else {
-		return errors.New("DestroyCluster: Juju.Kind must be a supported cloud")
+		return errors.New("Spinup error: Juju.Kind must be a supported cloud")
 	}
 
 	credscommand := "--credential=" + user
@@ -54,7 +54,8 @@ func (j *Juju) Spinup() error {
 	cmd.Env = append(os.Environ(), tmp)
 	out, err := cmd.Output()
 	if err != nil {
-		return fmt.Errorf("Spinup error with bootstrap: %s", err)
+		// return fmt.Errorf("Spinup error with bootstrap: %s", err)
+		return fmt.Errorf("Spinup error with bootstrap: %v: %s", err, err.(*exec.ExitError).Stderr)
 	}
 	log.Debug(string(out))
 
@@ -62,7 +63,7 @@ func (j *Juju) Spinup() error {
 	cmd.Env = append(os.Environ(), tmp)
 	out, err = cmd.Output()
 	if err != nil {
-		return fmt.Errorf("Spinup error with add-model: %s", err)
+		return fmt.Errorf("Spinup error with add-model:%v: %s", err, err.(*exec.ExitError).Stderr)
 	}
 	log.Debug(string(out))
 
@@ -70,7 +71,7 @@ func (j *Juju) Spinup() error {
 	cmd.Env = append(os.Environ(), tmp)
 	out, err = cmd.Output()
 	if err != nil {
-		return fmt.Errorf("Spinup error with deploy: %s", err)
+		return fmt.Errorf("Spinup error with deploy: %v: %s", err, err.(*exec.ExitError).Stderr)
 	}
 	log.Debug(string(out))
 
@@ -84,12 +85,12 @@ func (j *Juju) ControllerReady() (bool, error) {
 	cmd.Env = append(os.Environ(), tmp)
 	out, err := cmd.Output()
 	if err != nil {
-		return false, fmt.Errorf("ControllerReady error: %s", err)
+		return false, fmt.Errorf("ControllerReady error: %v: %s", err, err.(*exec.ExitError).Stderr)
 	}
 
 	err = json.Unmarshal([]byte(out), &jModels)
 	if err != nil {
-		return false, fmt.Errorf("ControllerReady unmarshal error: %s", err)
+		return false, fmt.Errorf("ControllerReady unmarshal error: %v: %s", err, err.(*exec.ExitError).Stderr)
 	}
 
 	log.Debugf("ControllerReady: %+v", jModels)
@@ -113,7 +114,7 @@ func (j *Juju) GetStatus() (string, error) {
 	cmd.Env = append(os.Environ(), tmp)
 	out, err := cmd.Output()
 	if err != nil {
-		return "", fmt.Errorf("GetStatus error: %s", err)
+		return "", fmt.Errorf("GetStatus error: %v: %s", err, err.(*exec.ExitError).Stderr)
 	}
 	log.Debug(string(out))
 	return string(out), nil
@@ -126,12 +127,12 @@ func (j *Juju) ClusterReady() (bool, error) {
 	cmd.Env = append(os.Environ(), tmp)
 	out, err := cmd.Output()
 	if err != nil {
-		return false, fmt.Errorf("ClusterReady error: %s", err)
+		return false, fmt.Errorf("ClusterReady error: %v: %s", err, err.(*exec.ExitError).Stderr)
 	}
 
 	err = json.Unmarshal([]byte(out), &jStats)
 	if err != nil {
-		return false, fmt.Errorf("ClusterReady error: %s", err)
+		return false, fmt.Errorf("ClusterReady error: %v: %s", err, err.(*exec.ExitError).Stderr)
 	}
 
 	for k := range jStats.Machines {
@@ -161,7 +162,7 @@ func (j *Juju) GetKubeConfig() ([]byte, error) {
 	cmd.Env = append(os.Environ(), tmp)
 	out, err := cmd.Output()
 	if err != nil {
-		return []byte{}, fmt.Errorf("GetKubeConfig failed: %s", err)
+		return []byte{}, fmt.Errorf("GetKubeConfig failed: %v: %s", err, err.(*exec.ExitError).Stderr)
 	}
 	return out, nil
 }
@@ -183,7 +184,7 @@ func (j *Juju) DestroyCluster() error {
 	cmd.Env = append(os.Environ(), tmp)
 	out, err := cmd.Output()
 	if err != nil {
-		return fmt.Errorf("DestroyCluster error: %s", err)
+		return fmt.Errorf("DestroyCluster error: %v: %s", err, err.(*exec.ExitError).Stderr)
 	}
 	log.Debug(string(out))
 	return nil
@@ -196,7 +197,7 @@ func (j *Juju) DestroyComplete() (bool, error) {
 	cmd.Env = append(os.Environ(), tmp)
 	out, err := cmd.Output()
 	if err != nil {
-		return false, fmt.Errorf("DestroyComplete error: %s", err)
+		return false, fmt.Errorf("DestroyComplete error: %v: %s", err, err.(*exec.ExitError).Stderr)
 	}
 
 	err = json.Unmarshal([]byte(out), &jControllers)
