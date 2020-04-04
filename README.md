@@ -14,7 +14,7 @@ Juju.Name. This path prefix defaults to `/tmp` and will result in the loss of th
 state as /tmp is ephemeral.
 
 Set this variable to a path with persistant storage:
-```
+```go
 import (
     "github.com/dstorck/gogo"
 )
@@ -75,7 +75,7 @@ gogo.JujuDataPrefix = "/data"
 
 ### Sample file to bring up maas cluster on Samsung's CNCT nuc lab:
 
-```
+```go
 package main
 
 import (
@@ -116,7 +116,7 @@ func main() {
 ```
 
 ### Sample file to bring up aws cluster
-```
+```go
 package main
 
 import (
